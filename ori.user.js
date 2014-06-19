@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
-// @version     1.0.1
+// @version     1.0.2
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
 // @grant       GM_addStyle
@@ -70,7 +70,7 @@ FIELDS.ASSIGNEE.select2();
 //functions
 
 /**
- *  Add button function 
+ *  Add button function
  */
 function addButton(text, action, className, icon) {
     if (typeof(icon) === "undefinded") {
@@ -180,7 +180,7 @@ FIELDS.DESCRIPTION.parent().hide(); //description
 $buttonsContainer.addClass('btn-group');
 $buttonsContainer.children().addClass('btn btn-default');
 $('a.icon-copy').remove();
-$('a.icon-edit').prepend('<span class="glyphicon glyphicon-pencil"></span> ');
+$('a.icon-edit').prepend('<span class="glyphicon glyphicon-pencil"></span> ').append('…');
 $('a.icon-time-add').prepend('<span class="glyphicon glyphicon-time"></span> ');
 $('a.icon-fav-off').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
 $('#issue-form input[type=submit]').addClass('btn btn-success form-submit-btn');
@@ -192,7 +192,7 @@ if (isAssignedToMe) {
     if (canStartProgress()) {
         addButton('Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT){
-        addButton('Resolve', 'resolveIssue()', 'btn-success', 'glyphicon glyphicon-ok');
+        addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon glyphicon-ok');
         addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
     }
 } else {

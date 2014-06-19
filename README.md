@@ -10,6 +10,8 @@ Install Greasemonkey or Tampermonkey for your browser:
 
 Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvements/raw/master/ori.user.js) to install script to your browser.
 
+![Redmine Improvement Image](http://i.imgur.com/QsJN9PS.png)
+
 Features
 --------
 
