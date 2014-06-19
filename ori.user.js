@@ -1,6 +1,10 @@
 // ==UserScript==
 // @name        Oggetto Redmine Improvements
-// @namespace   redmine
+// @description Add some useful features to Redmine's issue page
+// @author      Denis Obukhov
+// @namespace   obukhow.redmine
+// @downloadURL https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
+// @updateURL   https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
 // @include     http://redmine.oggettoweb.com/issues/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
