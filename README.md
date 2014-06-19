@@ -13,7 +13,8 @@ Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvem
 Features
 --------
 
-* Oggetto Redmine workflow particular support (Start Progress -> Froze)
+* Oggetto Redmine workflow particular support (Start Progress -> Froze|Resolve Issue)
+* Quick Issue updates in popup
 * One-click "Assign to me"
 * Easy select for asignee
 * Removed obligatory fields from form
@@ -26,3 +27,5 @@ Roadmap
 * In progress time counter (+ pause/resume)
 * My recent issues menu
 * Review passed/Review failed buttons to workflow
+* Comment markup preview in popup
+* Fix double toolbar

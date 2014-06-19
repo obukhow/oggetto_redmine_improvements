@@ -9,15 +9,15 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
-// @version     1.0.0
-// @resource    jqUI_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
+// @version     1.0.1
+// @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
 // ==/UserScript==
-var jqUI_CssSrc = GM_getResourceText ("jqUI_CSS");
+var select2_CssSrc = GM_getResourceText ("select2_CSS");
 var bootstrap_CssSrc = GM_getResourceText ("bootstrap_CSS");
-GM_addStyle (jqUI_CssSrc);
+GM_addStyle (select2_CssSrc);
 GM_addStyle (bootstrap_CssSrc);
 GM_addStyle ("@font-face {"+
   "font-family: 'Glyphicons Halflings';"+
@@ -39,6 +39,12 @@ var STATUS = {
 }
 
 var FIELDS = {
+    'TRACKER'         : $('#issue_tracker_id'),
+    'SUBJECT'         : $('#issue_subject'),
+    'PRIORITY'        : $('#issue_priority_id'),
+    'PARENT'          : $('#issue_parent_issue_id'),
+    'ESTIMATE'        : $('#issue_estimated_hours'),
+    'VERSION'         : $('#issue_fixed_version_id'),
     'ACTIVITY'        : $('#time_entry_activity_id'),
     'STATUS'          : $('#issue_status_id'),
     'ASSIGNEE'        : $('#issue_assigned_to_id'),
@@ -52,7 +58,9 @@ var FIELDS = {
 }
 
 var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
-var myID = $('#loggedas a').attr('href').match(/\/users\/(\d*)/i)[1];
+var myUserLink = $('#loggedas a').attr('href');
+var myID = myUserLink.match(/(\d*)$/i)[0];
+var issueID = location.pathname.match(/(\d*)$/i);
 var currentStatus = $('td.status').html();
 
 var $buttonsContainer = $('a.icon-edit').parent();
@@ -73,7 +81,23 @@ function addButton(text, action, className, icon) {
     if (typeof(className) === "undefinded") {
         className = 'btn-default';
     }
-    $('<div class="contextual"><a class="btn '+ className +'" onclick="' + action + '; return false;" href="#">' + iconHtml + '' + text + '</a></div>').insertAfter($buttonsContainer);
+    if ($('.manage-issue-buttons').length == 0) {
+        $('<div class="contextual manage-issue-buttons btn-group"></div>').insertAfter($buttonsContainer);
+    }
+    $('.manage-issue-buttons').append('<a class="btn '+ className +'" onclick="' + action + '; return false;" href="#">' + iconHtml + '' + text + '</a>');
+}
+
+/**
+ * Can start progress flag
+ *
+ * @returns {boolean}
+ */
+function canStartProgress() {
+    return (currentStatus == STATUS.NEW.TEXT ||
+        currentStatus == STATUS.FEEDBACK.TEXT ||
+        currentStatus == STATUS.REVIEW_FAILED.TEXT ||
+        currentStatus == STATUS.VERIFY_FAILED.TEXT ||
+        currentStatus == STATUS.FROZEN.TEXT);
 }
 
 /**
@@ -82,6 +106,43 @@ function addButton(text, action, className, icon) {
 unsafeWindow.startProgress = function() {
     FIELDS.STATUS.val(STATUS.IN_PROGRESS.VALUE);
     $('#issue-form').submit();
+}
+
+/**
+ * Resolve issue
+ */
+unsafeWindow.resolveIssue = function() {
+    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
+    FIELDS.TRACKER.parent().hide();
+    FIELDS.SUBJECT.parent().hide();
+    FIELDS.PRIORITY.parent().hide();
+    FIELDS.VERSION.parent().hide();
+    FIELDS.PARENT.parent().hide();
+    FIELDS.ESTIMATE.parent().hide();
+    $('#attachments_fields').parents('fieldset').hide();
+    $('#update').show();
+    $('#update h3').hide();
+    $('.form-preview-btn').hide();
+    unsafeWindow.jQuery.fancybox({
+        'type': 'inline',
+        'content': '#update',
+        'autoScale': false,
+        'autoDimensions': false,
+        'width':'800',
+        'height': '700',
+        'onClosed': function() {
+            FIELDS.TRACKER.parent().show();
+            FIELDS.SUBJECT.parent().show();
+            FIELDS.PRIORITY.parent().show();
+            FIELDS.VERSION.parent().show();
+            FIELDS.PARENT.parent().show();
+            FIELDS.ESTIMATE.parent().show();
+            $('#attachments_fields').parents('fieldset').show();
+            $('#update').hide();
+            $('.form-preview-btn').show();
+            $('#update h3').show();
+        }
+    });
 }
 
 /**
@@ -122,19 +183,18 @@ $('a.icon-copy').remove();
 $('a.icon-edit').prepend('<span class="glyphicon glyphicon-pencil"></span> ');
 $('a.icon-time-add').prepend('<span class="glyphicon glyphicon-time"></span> ');
 $('a.icon-fav-off').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
-
+$('#issue-form input[type=submit]').addClass('btn btn-success form-submit-btn');
+$('#issue-form input[type=submit]').next().addClass('btn btn-primary form-preview-btn').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
 
 //add buttons
 
 if (isAssignedToMe) {
-    if (currentStatus == STATUS.NEW.TEXT || currentStatus == STATUS.FEEDBACK.TEXT ||
-        currentStatus == STATUS.REVIEW_FAILED.TEXT || currentStatus == STATUS.VERIFY_FAILED.TEXT ||
-        currentStatus == STATUS.FROZEN.TEXT
-    ) {
+    if (canStartProgress()) {
         addButton('Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT){
+        addButton('Resolve', 'resolveIssue()', 'btn-success', 'glyphicon glyphicon-ok');
         addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
-    } 
+    }
 } else {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
 }
