@@ -9,7 +9,8 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
-// @version     1.0.2
+// @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
+// @version     1.1.0
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
 // @grant       GM_addStyle
@@ -24,7 +25,7 @@ GM_addStyle ("@font-face {"+
   "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot');" +
   "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');"+
 "}");
-GM_addStyle (".btn-success, .btn-primary { color: #fff !important;}");
+GM_addStyle (".btn-success, .btn-primary, .btn-warning { color: #fff !important;}");
 
 //
 var STATUS = {
@@ -54,7 +55,8 @@ var FIELDS = {
     'ORDER'           : $('#issue_custom_field_values_16'),
     'CATEGORY_ID'     : $('#issue_category_id'),
     'TAG'             : $('#issue_custom_field_values_1'),
-    'DESCRIPTION'     : $('#issue_description_and_toolbar')
+    'DESCRIPTION'     : $('#issue_description_and_toolbar'),
+    'SPENT_TIME'      : $('#time_entry_hours')
 }
 
 var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
@@ -101,11 +103,93 @@ function canStartProgress() {
 }
 
 /**
+ * is Timer started
+ * @return bool
+ */
+function isTimerStarted()
+{
+    var key = issueID + '_startTime';
+    return localStorage.getItem(key) !== null;
+}
+
+/**
+ * Is timer shown
+ */
+function isTimerShown() {
+    return $('.timer-btn').length > 0;
+}
+
+/**
+ * Start timer
+ */
+function startTimer() {
+    var key = issueID + '_startTime';
+    if (!isTimerStarted()) {
+        localStorage.setItem(key, new Date().getTime());
+    }
+}
+
+/**
+ * Show timer
+ */
+function showTimer() {
+    var key = issueID + '_startTime';
+    if (!isTimerStarted()) {
+        return;
+    }
+    var pausedTime = 0;
+    if (localStorage.getItem(issueID + '_pausedTime')) {
+        pausedTime = localStorage.getItem(issueID + '_pausedTime');
+    } else {
+        pausedTime = new Date().getTime() - localStorage.getItem(key);
+    }
+    addButton('<span id="timer-btn" class="timer-btn"></span>', '', 'btn-warning', 'glyphicon glyphicon-time');
+    $('.timer-btn').stopwatch({
+        startTime: pausedTime
+    }).stopwatch('start');
+
+}
+/**
+ * Get timer's time
+ */
+function getTimerTime() {
+    if (!isTimerStarted() || !isTimerShown()) {
+        return '';
+    }
+    var time = $('#timer-btn').stopwatch('getTime')/1000/60/60;
+    return time.toFixed(2);
+}
+
+/**
+ * Pause timer
+ */
+function pauseTimer() {
+    if (!isTimerStarted() || !isTimerShown()) {
+        return;
+    }
+    var pausedTime = 0;
+    if (localStorage.getItem(issueID + '_pausedTime')) {
+        pausedTime = localStorage.getItem(issueID + '_pausedTime');
+    }
+    pausedTime += $('#timer-btn').stopwatch('getTime');
+    localStorage.setItem(issueID + '_pausedTime', pausedTime);
+}
+
+/**
+ * Stop timer
+ */
+function stopTimer() {
+    localStorage.removeItem(issueID + '_startTime');
+    localStorage.removeItem(issueID + '_pausedTime');
+}
+
+/**
  * Start issue progress
  */
 unsafeWindow.startProgress = function() {
     FIELDS.STATUS.val(STATUS.IN_PROGRESS.VALUE);
     $('#issue-form').submit();
+    startTimer();
 }
 
 /**
@@ -119,6 +203,7 @@ unsafeWindow.resolveIssue = function() {
     FIELDS.VERSION.parent().hide();
     FIELDS.PARENT.parent().hide();
     FIELDS.ESTIMATE.parent().hide();
+    FIELDS.SPENT_TIME.val(getTimerTime());
     $('#attachments_fields').parents('fieldset').hide();
     $('#update').show();
     $('#update h3').hide();
@@ -130,6 +215,11 @@ unsafeWindow.resolveIssue = function() {
         'autoDimensions': false,
         'width':'800',
         'height': '700',
+        'onComplete': function() {
+                $('#issue-form').on('submit.resolve', function() {
+                stopTimer();
+            });
+        },
         'onClosed': function() {
             FIELDS.TRACKER.parent().show();
             FIELDS.SUBJECT.parent().show();
@@ -141,6 +231,7 @@ unsafeWindow.resolveIssue = function() {
             $('#update').hide();
             $('.form-preview-btn').show();
             $('#update h3').show();
+            $('#issue-form').off('.resolve');
         }
     });
 }
@@ -151,6 +242,7 @@ unsafeWindow.resolveIssue = function() {
 unsafeWindow.frozeProgress = function() {
     FIELDS.STATUS.val(STATUS.FROZEN.VALUE);
     $('#issue-form').submit();
+    pauseTimer();
 }
 
 /**
@@ -190,9 +282,10 @@ $('#issue-form input[type=submit]').next().addClass('btn btn-primary form-previe
 
 if (isAssignedToMe) {
     if (canStartProgress()) {
-        addButton('Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
+        addButton((isTimerStarted()) ? 'Continue' : 'Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT){
         addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon glyphicon-ok');
+        showTimer();
         addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
     }
 } else {
