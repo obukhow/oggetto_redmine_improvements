@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.1.1
+// @version     1.1.2
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @grant       GM_addStyle
@@ -65,7 +65,7 @@ var FIELDS = {
 var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
 var myUserLink = $('#loggedas a').attr('href');
 var myID = myUserLink.match(/(\d*)$/i)[0];
-var issueID = location.pathname.match(/(\d*)$/i);
+var issueID = location.pathname.match(/(\d*)$/i)[0];
 var currentStatus = $('td.status').html();
 
 var $buttonsContainer = $('a.icon-edit').parent();
