@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.1.3
+// @version     1.1.4
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @grant       GM_addStyle
@@ -271,6 +271,8 @@ function showTotalRegularTime() {
  * Show issue total regular time
  */
 function showMyTime() {
+    $('<tr><th></th><td></td>' +
+        '<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">loading...</td></tr>').insertAfter($('th.spent-time').parent());
     var totalHours, regularHours, fuckupHours;
     totalHours = regularHours = fuckupHours = '0';
     var url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
@@ -285,10 +287,7 @@ function showMyTime() {
                 '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
             $.get(url).done( function( data ) {
                 fuckupHours = _parseRedmineHours(data);
-                $('<tr><th></th><td></td>' +
-                    '<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">' +
-                    totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')' +
-                    '</td></tr>').insertBefore($('.attributes tr:last'));
+                $('td.spent-by-me').html(totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')');
             });
         });
     });
