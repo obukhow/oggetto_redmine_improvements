@@ -285,8 +285,10 @@ function showMyTime() {
                 '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
             $.get(url).done( function( data ) {
                 fuckupHours = _parseRedmineHours(data);
-                $('.attributes tr:last').append('<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">' +
-                    totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')</td>')
+                $('<tr><th></th><td></td>' +
+                    '<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">' +
+                    totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')' +
+                    '</td></tr>').insertBefore($('.attributes tr:last'));
             });
         });
     });
