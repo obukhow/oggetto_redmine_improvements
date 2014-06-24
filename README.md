@@ -15,11 +15,11 @@ Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvem
 Features
 --------
 
-* Oggetto Redmine workflow particular support (Start Progress -> Froze|Resolve Issue)
+* Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue)
 * Quick Issue updates in popup
 * One-click "Assign to me"
-* Easy select for asignee
-* Removed obligatory fields from form
+* Easy select for asignee with text-filter (uses [Select2](http://ivaynberg.github.io/select2/))
+* Removed obligatory fields from issue update form
 * Default value for Log time "Activity" is "Backend Development"
 * Default value for Log time "Time" is "Regular"
 * In progress time counter (+ pause/resume). Fills the "Spent time" field on resolve issue
