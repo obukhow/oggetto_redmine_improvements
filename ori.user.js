@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.1.2
+// @version     1.1.3
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @grant       GM_addStyle
@@ -256,7 +256,56 @@ unsafeWindow.assignToMe = function() {
     $('#issue-form').submit();
 }
 
+/**
+ * Show issue total regular time
+ */
+function showTotalRegularTime() {
+    var url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on&op' +
+        '[spent_on]=*&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
+    $.get(url).done( function( data ) {
+        $( "td.spent-time" ).append(' (R: ' + _parseRedmineHours(data) + ')' );
+    });
+}
 
+/**
+ * Show issue total regular time
+ */
+function showMyTime() {
+    var totalHours, regularHours, fuckupHours;
+    totalHours = regularHours = fuckupHours = '0';
+    var url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+        '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me';
+    $.get(url).done( function( data ) {
+        totalHours = _parseRedmineHours(data);
+        url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+            '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
+        $.get(url).done( function( data ) {
+            regularHours = _parseRedmineHours(data);
+            url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+                '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
+            $.get(url).done( function( data ) {
+                fuckupHours = _parseRedmineHours(data);
+                $('.attributes tr:last').append('<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">' +
+                    totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')</td>')
+            });
+        });
+    });
+
+
+
+}
+
+/**
+ * Parse redmine hours data
+ * @param data string
+ * @returns string
+ * @private
+ */
+function _parseRedmineHours(data) {
+    var content = $($.parseHTML(data)).filter('.total-hours').html();
+    var result = content.match(/<span class="hours hours-int">(\d*)<\/span><span class="hours hours-dec">(\.\d*)<\/span>/i);
+    return result[1] + result[2];
+}
 
 // set default values
 FIELDS.ACTIVITY.val(12); // activity: backend development
@@ -296,3 +345,5 @@ if (isAssignedToMe) {
 }
 
 
+showTotalRegularTime();
+showMyTime();

@@ -10,7 +10,7 @@ Install Greasemonkey or Tampermonkey for your browser:
 
 Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvements/raw/master/ori.user.js) to install script to your browser.
 
-![Redmine Improvement Image](http://i.imgur.com/Y5PWwA1.jpg =700x232)
+![Redmine Improvement Image](http://i.imgur.com/Y5PWwA1.jpg)
 
 Features
 --------
@@ -23,6 +23,7 @@ Features
 * Default value for Log time "Activity" is "Backend Development"
 * Default value for Log time "Time" is "Regular"
 * In progress time counter (+ pause/resume). Fills the "Spent time" field on resolve issue
+* Adds total regular time, shows time "Spent by me" with "Regular" and "Fuckup" trackers
 
 Roadmap
 -------
