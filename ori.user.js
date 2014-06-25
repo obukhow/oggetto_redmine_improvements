@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.1.6
+// @version     1.2.0
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @grant       GM_addStyle
@@ -25,7 +25,7 @@ GM_addStyle ("@font-face {"+
   "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot');" +
   "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');"+
 "}");
-GM_addStyle (".btn-success, .btn-primary, .btn-warning { color: #fff !important;}");
+GM_addStyle (".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
 GM_addStyle ("#content h2{line-height:40px;");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;");
 
@@ -59,7 +59,10 @@ var FIELDS = {
     'CATEGORY_ID'     : $('#issue_category_id'),
     'TAG'             : $('#issue_custom_field_values_1'),
     'DESCRIPTION'     : $('#issue_description_and_toolbar'),
-    'SPENT_TIME'      : $('#time_entry_hours')
+    'SPENT_TIME'      : $('#time_entry_hours'),
+    'TIME_COMMENT'    : $('#time_entry_comments'),
+    'NOTES'           : $('#issue_notes'),
+    'PRIVATE_NOTES'   : $('#issue_private_notes')
 }
 
 var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
@@ -67,6 +70,7 @@ var myUserLink = $('#loggedas a').attr('href');
 var myID = myUserLink.match(/(\d*)$/i)[0];
 var issueID = location.pathname.match(/(\d*)$/i)[0];
 var currentStatus = $('td.status').html();
+var timeKey       = issueID + '_startTime';
 
 var $buttonsContainer = $('a.icon-edit').parent();
 
@@ -106,13 +110,30 @@ function canStartProgress() {
 }
 
 /**
+ * Can do issue review
+ */
+function canDoReview() {
+    if (currentStatus == STATUS.RESOLVED.TEXT) { //if issue in Resolved status
+        var $a = $('.journal:last');
+        if ($a.length > 0 && $a.hasClass('has-notes')) { // and last comment has text
+            if ($a.find('.user').attr('href') != myUserLink) { // and comment does not belong to current user
+                if ($a.find('.external').length > 0) { // and comment has external links
+                    return ( $a.find('.external').attr('href') // and link href is pull request link
+                        .match(/^https:\/\/github\.com\/[a-zA-Z0-9]{1,}\/[a-zA-Z0-9]{1,}\/pull\/[0-9]{1,}$/i) )
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/**
  * is Timer started
  * @return bool
  */
 function isTimerStarted()
 {
-    var key = issueID + '_startTime';
-    return localStorage.getItem(key) !== null;
+    return localStorage.getItem(timeKey) !== null;
 }
 
 /**
@@ -121,32 +142,36 @@ function isTimerStarted()
 function isTimerShown() {
     return $('.timer-btn').length > 0;
 }
-
+/**
+ * Get time diff between current time and stored time
+ * @returns {number}
+ */
+function getTimeDiff() {
+    return (new Date().getTime() - parseInt(localStorage.getItem(timeKey), 10));
+}
 /**
  * Start timer
  */
 function startTimer() {
-    var key = issueID + '_startTime';
     var pausedKey = issueID + '_pausedTime';
     var startTime = new Date().getTime();
     if (localStorage.getItem(pausedKey)) {
         startTime -= parseInt(localStorage.getItem(pausedKey), 10);
         localStorage.removeItem(pausedKey);
     }
-    localStorage.setItem(key, startTime);
+    localStorage.setItem(timeKey, startTime);
 }
 
 /**
  * Show timer
  */
 function showTimer() {
-    var key = issueID + '_startTime';
     if (!isTimerStarted()) {
         return;
     }
-    var pausedTime = new Date().getTime() - parseInt(localStorage.getItem(key), 10);
+    var pausedTime = getTimeDiff();
 
-    addButton('<span id="timer-btn" class="timer-btn"></span>', '', 'btn-warning', 'glyphicon glyphicon-time');
+    addButton('<span id="timer-btn" class="timer-btn"></span>', 'logTimerTime()', 'btn-warning', 'glyphicon-time');
     $('.timer-btn').stopwatch({
         startTime: pausedTime
     }).stopwatch('start');
@@ -159,9 +184,10 @@ function getTimerTime() {
     if (!isTimerStarted() || !isTimerShown()) {
         return '';
     }
-    var time = $('#timer-btn').stopwatch('getTime')/1000/60/60;
+    var time = getTimeDiff()/1000/60/60;
     return time.toFixed(2);
 }
+
 
 /**
  * Pause timer
@@ -171,10 +197,7 @@ function pauseTimer() {
         return;
     }
     var pausedTime = 0;
-    if (localStorage.getItem(issueID + '_pausedTime')) {
-        pausedTime = localStorage.getItem(issueID + '_pausedTime');
-    }
-    pausedTime += $('#timer-btn').stopwatch('getTime');
+    pausedTime += getTimeDiff();
     localStorage.setItem(issueID + '_pausedTime', pausedTime);
 }
 
@@ -182,7 +205,7 @@ function pauseTimer() {
  * Stop timer
  */
 function stopTimer() {
-    localStorage.removeItem(issueID + '_startTime');
+    localStorage.removeItem(timeKey);
     localStorage.removeItem(issueID + '_pausedTime');
 }
 
@@ -195,22 +218,43 @@ unsafeWindow.startProgress = function() {
     startTimer();
 }
 
-/**
- * Resolve issue
- */
-unsafeWindow.resolveIssue = function() {
-    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
+function formPrepareToShowInPopup() {
     FIELDS.TRACKER.parent().hide();
     FIELDS.SUBJECT.parent().hide();
     FIELDS.PRIORITY.parent().hide();
     FIELDS.VERSION.parent().hide();
     FIELDS.PARENT.parent().hide();
     FIELDS.ESTIMATE.parent().hide();
-    FIELDS.SPENT_TIME.val(getTimerTime());
     $('#attachments_fields').parents('fieldset').hide();
     $('#update').show();
     $('#update h3').hide();
     $('.form-preview-btn').hide();
+}
+
+function formReturnToPreviousStateAfterPopupClose() {
+    FIELDS.TRACKER.parent().show();
+    FIELDS.SUBJECT.parent().show();
+    FIELDS.PRIORITY.parent().show();
+    FIELDS.VERSION.parent().show();
+    FIELDS.PARENT.parent().show();
+    FIELDS.ESTIMATE.parent().show();
+    $('#attachments_fields').parents('fieldset').show();
+    $('#update').hide();
+    $('.form-preview-btn').show();
+    $('#update h3').show();
+    FIELDS.SPENT_TIME.val('');
+    FIELDS.TIME_COMMENT.val('');
+    FIELDS.PRIVATE_NOTES.prop('checked', false);
+    FIELDS.NOTES.val('');
+    FIELDS.ASSIGNEE.val(myID);
+}
+/**
+ * Resolve issue
+ */
+unsafeWindow.resolveIssue = function() {
+    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
+    formPrepareToShowInPopup();
+    FIELDS.SPENT_TIME.val(getTimerTime());
     unsafeWindow.jQuery.fancybox({
         'type': 'inline',
         'content': '#update',
@@ -224,19 +268,51 @@ unsafeWindow.resolveIssue = function() {
             });
         },
         'onClosed': function() {
-            FIELDS.TRACKER.parent().show();
-            FIELDS.SUBJECT.parent().show();
-            FIELDS.PRIORITY.parent().show();
-            FIELDS.VERSION.parent().show();
-            FIELDS.PARENT.parent().show();
-            FIELDS.ESTIMATE.parent().show();
-            $('#attachments_fields').parents('fieldset').show();
-            $('#update').hide();
-            $('.form-preview-btn').show();
-            $('#update h3').show();
+            formReturnToPreviousStateAfterPopupClose();
             $('#issue-form').off('.resolve');
         }
     });
+}
+
+/**
+ * Show review result form
+ *
+ * @private
+ */
+function _showReviewResultPopup() {
+    FIELDS.SPENT_TIME.val('0.1');
+    FIELDS.TIME_COMMENT.val('Проверка кода по пул-реквесту');
+    FIELDS.PRIVATE_NOTES.prop('checked', true);
+    formPrepareToShowInPopup();
+    unsafeWindow.jQuery.fancybox({
+        'type': 'inline',
+        'content': '#update',
+        'autoScale': false,
+        'autoDimensions': false,
+        'width': '800',
+        'height': '700',
+        'onClosed': function () {
+            formReturnToPreviousStateAfterPopupClose();
+
+        }
+    });
+}
+/**
+ * Review Passed
+ */
+unsafeWindow.reviewPassed = function() {
+    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
+    FIELDS.NOTES.val('Review Passed');
+    _showReviewResultPopup();
+}
+
+/**
+ * Review failed
+ */
+unsafeWindow.reviewFailed = function() {
+    FIELDS.NOTES.val('Комментарии к пулл-реквесту');
+    FIELDS.STATUS.val(STATUS.REVIEW_FAILED.VALUE);
+    _showReviewResultPopup();
 }
 
 /**
@@ -254,6 +330,30 @@ unsafeWindow.frozeProgress = function() {
 unsafeWindow.assignToMe = function() {
     FIELDS.ASSIGNEE.val(myID);
     $('#issue-form').submit();
+}
+
+/**
+ * Log time from timer
+ */
+unsafeWindow.logTimerTime = function() {
+    return false; // @todo fix this feature
+    unsafeWindow.jQuery.fancybox(   {
+        'type': 'ajax',
+        'href': location.href + '/time_entries/new#content',
+        'autoScale': false,
+        'autoDimensions': false,
+        'width':'800',
+        'height': '700',
+        'onComplete': function() {
+            $('#new_time_entry').on('submit.resolve', function() {
+                stopTimer();
+                startTimer();
+            });
+        },
+        'onClosed': function() {
+            $('#issue-form').off('.resolve');
+        }
+    });
 }
 
 /**
@@ -337,9 +437,12 @@ if (isAssignedToMe) {
     if (canStartProgress()) {
         addButton((isTimerStarted()) ? 'Continue' : 'Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT){
-        addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon glyphicon-ok');
+        addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon-ok');
         showTimer();
         addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
+    } else if (canDoReview()) {
+        addButton('Review passed…', 'reviewPassed()', 'btn-success', 'glyphicon-thumbs-up');
+        addButton('Review failed…', 'reviewFailed()', 'btn-danger', 'glyphicon-thumbs-down');
     }
 } else {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
