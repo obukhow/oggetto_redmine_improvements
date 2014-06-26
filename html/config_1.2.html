@@ -12,7 +12,7 @@
                         <option value="designer" data-activity="8">Designer</option>
                     </select>
                 </p>
-                <p class="reviewer"><label for="reviewer"><input id="reviewer" value="1" type="checkbox"> I'm also a reviewer</label></p>
+                <p class="reviewer"><label for="reviewer">I'm also a reviewer</label><input id="reviewer" value="1" type="checkbox"></p>
                 <p><label for="activity">Default value for Activity</label>
                     <select id="activity">
                         <option value="8">Design</option>
@@ -33,6 +33,7 @@
         if (value == "back_dev" || value == "front_dev") {
             $('.reviewer').show();
         } else {
+            $('#reviewer').prop('checked', false);
             $('.reviewer').hide();
         }
         $('#activity').val($("#user_role option:selected").data('activity'));
