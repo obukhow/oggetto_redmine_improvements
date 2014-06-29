@@ -17,12 +17,13 @@ Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvem
 Features
 --------
 
-* Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue -> Review Pased|Review Failed)
-* Quick Issue updates in popup
+* Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue -> Review Pased|Review Failed -> Test Passed|Test Failed)
+* Quick Issue updates in popup for workflow
 * One-click "Assign to me"
 * Easy select for asignee with text-filter (uses [Select2](http://ivaynberg.github.io/select2/))
 * Removed obligatory fields from issue update form
-* Default value for Log time "Activity" is "Backend Development"
+* User role configuration and separate workflows for each role
+* Default value for Log time "Activity" according to user role
 * Default value for Log time "Time" is "Regular"
 * In progress time counter (+ pause/resume). Fills the "Spent time" field on resolve issue
 * Adds total regular time, shows time "Spent by me" with "Regular" and "Fuckup" trackers
@@ -33,5 +34,6 @@ Roadmap
 * ~~In progress time counter (+ pause/resume)~~
 * My recent issues menu
 * ~~Review passed/Review failed buttons to workflow~~
+* ~~User role configuration and separate workflows for each role~~
 * Comment markup preview in popup
 * Fix double toolbar

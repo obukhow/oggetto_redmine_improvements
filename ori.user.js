@@ -10,14 +10,17 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.2.1
+// @version     1.3.0
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
+// @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @grant       unsafeWindow
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
 // @grant       GM_getResourceText
+// @grant       GM_registerMenuCommand
+// @grant       GM_listValues
 // ==/UserScript==
 var select2_CssSrc = GM_getResourceText ("select2_CSS");
 var bootstrap_CssSrc = GM_getResourceText ("bootstrap_CSS");
@@ -30,7 +33,7 @@ GM_addStyle ("@font-face {"+
 "}");
 GM_addStyle (".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
 GM_addStyle ("#content h2{line-height:40px;");
-GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;");
+GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 
 // variables
 
@@ -66,7 +69,23 @@ var FIELDS = {
     'TIME_COMMENT'    : $('#time_entry_comments'),
     'NOTES'           : $('#issue_notes'),
     'PRIVATE_NOTES'   : $('#issue_private_notes')
-}
+};
+
+var ROLES = {
+    'BACKEND_DEVELOPER' : 'back_dev',
+    'FRONTEND_DEVELOPER': 'front_dev',
+    'QA'                : 'qa',
+    'PM'                : 'pm',
+    'DESIGNER'          : 'designer'
+};
+
+var ACTIVITIES = {
+    'BACKEND_DEVELOPMENT' : 12,
+    'FRONTEND_DEVELOPMENT': 13,
+    'TESTING'             : 11,
+    'PROJECT_MANAGEMENT'  : 16,
+    'DESIGN'              : 8
+};
 
 var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
 var myUserLink = $('#loggedas a').attr('href');
@@ -80,6 +99,31 @@ var $buttonsContainer = $('a.icon-edit').parent();
 FIELDS.ASSIGNEE.select2();
 
 //functions
+
+/**
+ * Get my role
+ *
+ * @returns {string}
+ */
+function getMyRole() {
+    return GM_getValue('user_role', ROLES.BACKEND_DEVELOPER);
+}
+
+/**
+ * Get reviewer flag
+ * @returns {boolean}
+ */
+function isReviewer() {
+    return GM_getValue('is_reviewer', false);
+}
+
+/**
+ * Get default activity
+ * @returns {numeric}
+ */
+function getDefaultActivity() {
+    return GM_getValue('def_activity', ACTIVITIES.BACKEND_DEVELOPMENT);
+}
 
 /**
  *  Add button function
@@ -100,6 +144,65 @@ function addButton(text, action, className, icon) {
 }
 
 /**
+ * get start progress button text
+ *
+ * @returns {string}
+ */
+function getStartProgressText() {
+     if (isTimerStarted()) {
+         return 'Continue Progress';
+     }
+     if (getMyRole() == ROLES.QA) {
+         return 'Start Testing';
+     }
+     if (canDoReview()) {
+         return 'Start Review';
+     }
+     return 'Start Progress';
+}
+
+/**
+ * Show config popup
+ */
+function showConfig() {
+    if ($('#configFormContainer').length < 1) {
+        $('body').append(GM_getResourceText("configForm_HTML"));
+    } else {
+        $('#configFormContainer').show();
+    }
+    setTimeout(function(){ // to allow inserted content be handled by browser
+        unsafeWindow.jQuery.fancybox({
+            'type': 'inline',
+            'content': '#config_form_block',
+            'autoScale': false,
+            'autoDimensions': false,
+            'width':'600',
+            'height': '200',
+            'onComplete': function() {
+                setTimeout(function() {
+                    $('#user_role').val(getMyRole());
+                    $('#reviewer').prop('checked', isReviewer());
+                    $('#activity').val(getDefaultActivity());
+                }, 0);
+
+
+                $('#config_form').on('submit.save_config', function(e) {
+                    GM_setValue('user_role', $('#user_role').val());
+                    GM_setValue('is_reviewer', $('#reviewer').prop('checked'));
+                    GM_setValue('def_activity', $('#activity').val());
+                    FIELDS.ACTIVITY.val(getDefaultActivity());
+                    unsafeWindow.jQuery.fancybox.close();
+                });
+            },
+            'onClosed': function() {
+                $('#config_form').off('.save_config');
+                $('#configFormContainer').hide();
+            }
+        });
+    }, 500);
+}
+
+/**
  * Can start progress flag
  *
  * @returns {boolean}
@@ -116,9 +219,19 @@ function canStartProgress() {
  * Can do issue review
  */
 function canDoReview() {
+    if (!isReviewer()) {
+        return false;
+    }
     if (currentStatus == STATUS.RESOLVED.TEXT) { //if issue in Resolved status
         var $a = $('.journal:last');
-        if ($a.length > 0 && $a.hasClass('has-notes')) { // and last comment has text
+        if ($a.length > 0) { // and issue has comments
+            if (!$a.hasClass('has-notes')) { // if last comment has no comment text
+                if ($a.prev().hasClass('has-notes')) { // check last but one comment
+                    $a = $a.prev();
+                } else {
+                    return false;
+                }
+            }
             if ($a.find('.user').attr('href') != myUserLink) { // and comment does not belong to current user
                 if ($a.find('.external').length > 0) { // and comment has external links
                     return ( $a.find('.external').attr('href') // and link href is pull request link
@@ -128,6 +241,40 @@ function canDoReview() {
         }
     }
     return false;
+}
+
+/**
+ * Camel case string formatter
+ *
+ * @param str
+ * @returns {string}
+ */
+function camelCase(str) {
+    var camelCased = str.toLowerCase().replace(/[-_ .]+(.)?/g, function (match, p) {
+        if (p) {
+            return p.toUpperCase();
+        }
+        return '';
+    }).replace(/[^\w]/gi, '');
+    return camelCased;
+}
+
+/**
+ * issue on review flag
+ *
+ * @returns {boolean}
+ */
+function isOnReview() {
+    return GM_getValue(issueID + '_review');
+}
+
+/**
+ * issue on testing flag
+ *
+ * @returns {boolean}
+ */
+function isOnTesting() {
+    return GM_getValue(issueID + '_testing');
 }
 
 /**
@@ -221,6 +368,34 @@ unsafeWindow.startProgress = function() {
     startTimer();
 }
 
+/**
+ * Continue issue progress
+ */
+unsafeWindow.continueProgress = function() {
+    unsafeWindow.startProgress();
+}
+
+/**
+ * Start issue review
+ */
+unsafeWindow.startReview = function() {
+    setTimeout(function() {
+        GM_setValue(issueID + '_review', true);
+    }, 0);
+    unsafeWindow.startProgress();
+}
+
+/**
+ * Start issue testing
+ */
+unsafeWindow.startTesting = function() {
+    setTimeout(function() {
+        GM_setValue(issueID + '_testing', true);
+    }, 0);
+
+    unsafeWindow.startProgress();
+}
+
 function formPrepareToShowInPopup() {
     FIELDS.TRACKER.parent().hide();
     FIELDS.SUBJECT.parent().hide();
@@ -250,6 +425,7 @@ function formReturnToPreviousStateAfterPopupClose() {
     FIELDS.PRIVATE_NOTES.prop('checked', false);
     FIELDS.NOTES.val('');
     FIELDS.ASSIGNEE.val(myID);
+    FIELDS.ACTIVITY.val(getDefaultActivity());
 }
 /**
  * Resolve issue
@@ -283,7 +459,7 @@ unsafeWindow.resolveIssue = function() {
  * @private
  */
 function _showReviewResultPopup() {
-    FIELDS.SPENT_TIME.val('0.1');
+    FIELDS.SPENT_TIME.val(getTimerTime());
     FIELDS.TIME_COMMENT.val('Проверка кода по пул-реквесту');
     FIELDS.PRIVATE_NOTES.prop('checked', true);
     formPrepareToShowInPopup();
@@ -296,7 +472,12 @@ function _showReviewResultPopup() {
         'height': '700',
         'onClosed': function () {
             formReturnToPreviousStateAfterPopupClose();
-
+            $('#issue-form').off('.reviewResult');
+        },
+        'onComplete': function() {
+            $('#issue-form').on('submit.reviewResult', function() {
+                GM_deleteValue(issueID + '_review');
+            });
         }
     });
 }
@@ -394,9 +575,6 @@ function showMyTime() {
             });
         });
     });
-
-
-
 }
 
 /**
@@ -412,7 +590,7 @@ function _parseRedmineHours(data) {
 }
 
 // set default values
-FIELDS.ACTIVITY.val(12); // activity: backend development
+FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
 FIELDS.TIME_TYPE.val('Regular'); //type: regular
 // hide fields
 FIELDS.ISSUE_START_DATE.parent().hide(); // issue start date
@@ -438,14 +616,22 @@ $('#issue-form input[type=submit]').next().addClass('btn btn-primary form-previe
 
 if (isAssignedToMe) {
     if (canStartProgress()) {
-        addButton((isTimerStarted()) ? 'Continue' : 'Start Progress', 'startProgress()', 'btn-success', 'glyphicon-play-circle');
+        var text = getStartProgressText();
+        addButton(text, camelCase(text) + '()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT){
-        addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon-ok');
-        showTimer();
-        addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
-    } else if (canDoReview()) {
-        addButton('Review passed…', 'reviewPassed()', 'btn-success', 'glyphicon-thumbs-up');
-        addButton('Review failed…', 'reviewFailed()', 'btn-danger', 'glyphicon-thumbs-down');
+        if (isOnReview()) {
+            addButton('Review passed…', 'reviewPassed()', 'btn-success', 'glyphicon-thumbs-up');
+            showTimer();
+            addButton('Review failed…', 'reviewFailed()', 'btn-danger', 'glyphicon-thumbs-down');
+        } else if (isOnTesting()) {
+            addButton('Test passed…', 'resolveIssue()', 'btn-success', 'glyphicon-thumbs-up');
+            showTimer();
+            addButton('Test failed…', 'reviewFailed()', 'btn-danger', 'glyphicon-thumbs-down');
+        } else {
+            addButton('Resolve…', 'resolveIssue()', 'btn-success', 'glyphicon-ok');
+            showTimer();
+            addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
+        }
     }
 } else {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
@@ -454,3 +640,8 @@ if (isAssignedToMe) {
 
 showTotalRegularTime();
 showMyTime();
+
+if (!GM_getValue('user_role')) {
+    showConfig();
+}
+GM_registerMenuCommand("Preferences…", showConfig, "C");
