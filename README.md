@@ -17,7 +17,7 @@ Click link [ORI User Script](https://github.com/obukhow/oggetto_redmine_improvem
 Features
 --------
 
-* Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue -> Review Pased|Review Failed -> Test Passed|Test Failed)
+* Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue -> Review Pased|Review Failed -> Test Passed|Test Failed -> Closed)
 * Quick Issue updates in popup for workflow
 * One-click "Assign to me"
 * Easy select for asignee with text-filter (uses [Select2](http://ivaynberg.github.io/select2/))
