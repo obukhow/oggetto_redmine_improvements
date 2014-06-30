@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.0
+// @version     1.3.1
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -45,7 +45,8 @@ var STATUS = {
     'FROZEN': {"VALUE": 8, "TEXT": "Frozen"},
     'REVIEW_FAILED': {"VALUE": 18, "TEXT": "Review failed"},
     'VERIFY_FAILED': {"VALUE": 17, "TEXT": "Verify failed"},
-    'READY_FOR_STAGE': {"VALUE": 14, "TEXT": "Ready for Stage"}
+    'READY_FOR_STAGE': {"VALUE": 14, "TEXT": "Ready for Stage"},
+    'CLOSED': {"VALUE": 5, "TEXT": "Closed"}
 }
 
 var FIELDS = {
@@ -213,6 +214,24 @@ function canStartProgress() {
         currentStatus == STATUS.REVIEW_FAILED.TEXT ||
         currentStatus == STATUS.VERIFY_FAILED.TEXT ||
         currentStatus == STATUS.FROZEN.TEXT);
+}
+
+/**
+ * Can start test
+ *
+ * @returns {boolean}
+ */
+function canStartTest() {
+    return (currentStatus == STATUS.RESOLVED.TEXT && getMyRole() == ROLES.QA)
+}
+
+/**
+ * Can start test
+ *
+ * @returns {boolean}
+ */
+function canClose() {
+    return (currentStatus == STATUS.RESOLVED.TEXT && getMyRole() == ROLES.PM)
 }
 
 /**
@@ -541,6 +560,14 @@ unsafeWindow.logTimerTime = function() {
 }
 
 /**
+ * Close issue
+ */
+unsafeWindow.closeIssue = function() {
+    FIELDS.STATUS.val(STATUS.CLOSED.VALUE);
+    $('#issue-form').submit();
+}
+
+/**
  * Show issue total regular time
  */
 function showTotalRegularTime() {
@@ -632,6 +659,11 @@ if (isAssignedToMe) {
             showTimer();
             addButton('Froze', 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
         }
+    } else if (canStartTest()) {
+        var text = getStartProgressText();
+        addButton(text, camelCase(text) + '()', 'btn-success', 'glyphicon-play-circle');
+    } else if (canClose()) {
+        addButton('Close', 'closeIssue()', 'btn-danger', 'glyphicon-remove');
     }
 } else {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
