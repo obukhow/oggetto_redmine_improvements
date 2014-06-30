@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.1
+// @version     1.3.2
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -238,28 +238,7 @@ function canClose() {
  * Can do issue review
  */
 function canDoReview() {
-    if (!isReviewer()) {
-        return false;
-    }
-    if (currentStatus == STATUS.RESOLVED.TEXT) { //if issue in Resolved status
-        var $a = $('.journal:last');
-        if ($a.length > 0) { // and issue has comments
-            if (!$a.hasClass('has-notes')) { // if last comment has no comment text
-                if ($a.prev().hasClass('has-notes')) { // check last but one comment
-                    $a = $a.prev();
-                } else {
-                    return false;
-                }
-            }
-            if ($a.find('.user').attr('href') != myUserLink) { // and comment does not belong to current user
-                if ($a.find('.external').length > 0) { // and comment has external links
-                    return ( $a.find('.external').attr('href') // and link href is pull request link
-                        .match(/^https:\/\/github\.com\/[a-zA-Z0-9]{1,}\/[a-zA-Z0-9]{1,}\/pull\/[0-9]{1,}$/i) )
-                }
-            }
-        }
-    }
-    return false;
+    return (currentStatus == STATUS.RESOLVED.TEXT && isReviewer());
 }
 
 /**
@@ -664,6 +643,8 @@ if (isAssignedToMe) {
         addButton(text, camelCase(text) + '()', 'btn-success', 'glyphicon-play-circle');
     } else if (canClose()) {
         addButton('Close', 'closeIssue()', 'btn-danger', 'glyphicon-remove');
+    } else if (canDoReview()) {
+        addButton('Start Review', 'startReview()', 'btn-success', 'glyphicon-play-circle');
     }
 } else {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
