@@ -26,6 +26,7 @@ Features
 * Default value for Log time "Activity" according to user role
 * Default value for Log time "Time" is "Regular"
 * In progress time counter (+ pause/resume). Fills the "Spent time" field on resolve issue
+* Click on timer to log time and reset counter
 * Adds total regular time, shows time "Spent by me" with "Regular" and "Fuckup" trackers
 
 Roadmap

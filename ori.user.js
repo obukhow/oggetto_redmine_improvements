@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.2
+// @version     1.3.3
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -32,7 +32,9 @@ GM_addStyle ("@font-face {"+
   "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');"+
 "}");
 GM_addStyle (".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
+GM_addStyle (".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;}");
 GM_addStyle ("#content h2{line-height:40px;");
+GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 
 // variables
@@ -49,28 +51,7 @@ var STATUS = {
     'CLOSED': {"VALUE": 5, "TEXT": "Closed"}
 }
 
-var FIELDS = {
-    'TRACKER'         : $('#issue_tracker_id'),
-    'SUBJECT'         : $('#issue_subject'),
-    'PRIORITY'        : $('#issue_priority_id'),
-    'PARENT'          : $('#issue_parent_issue_id'),
-    'ESTIMATE'        : $('#issue_estimated_hours'),
-    'VERSION'         : $('#issue_fixed_version_id'),
-    'ACTIVITY'        : $('#time_entry_activity_id'),
-    'STATUS'          : $('#issue_status_id'),
-    'ASSIGNEE'        : $('#issue_assigned_to_id'),
-    'TIME_TYPE'       : $('#time_entry_custom_field_values_12'),
-    'ISSUE_START_DATE': $('#issue_start_date'),
-    'ISSUE_DUE_DATE'  : $('#issue_due_date'),
-    'ORDER'           : $('#issue_custom_field_values_16'),
-    'CATEGORY_ID'     : $('#issue_category_id'),
-    'TAG'             : $('#issue_custom_field_values_1'),
-    'DESCRIPTION'     : $('#issue_description_and_toolbar'),
-    'SPENT_TIME'      : $('#time_entry_hours'),
-    'TIME_COMMENT'    : $('#time_entry_comments'),
-    'NOTES'           : $('#issue_notes'),
-    'PRIVATE_NOTES'   : $('#issue_private_notes')
-};
+var FIELDS;
 
 var ROLES = {
     'BACKEND_DEVELOPER' : 'back_dev',
@@ -97,9 +78,50 @@ var timeKey       = issueID + '_startTime';
 
 var $buttonsContainer = $('a.icon-edit').parent();
 
-FIELDS.ASSIGNEE.select2();
 
 //functions
+
+/**
+ * Init form elements
+ *
+ * @return void
+ */
+function initFormElements() {
+    FIELDS = {
+        'TRACKER'         : $('#issue_tracker_id'),
+        'SUBJECT'         : $('#issue_subject'),
+        'PRIORITY'        : $('#issue_priority_id'),
+        'PARENT'          : $('#issue_parent_issue_id'),
+        'ESTIMATE'        : $('#issue_estimated_hours'),
+        'VERSION'         : $('#issue_fixed_version_id'),
+        'ACTIVITY'        : $('#time_entry_activity_id'),
+        'STATUS'          : $('#issue_status_id'),
+        'ASSIGNEE'        : $('#issue_assigned_to_id'),
+        'TIME_TYPE'       : $('#time_entry_custom_field_values_12'),
+        'ISSUE_START_DATE': $('#issue_start_date'),
+        'ISSUE_DUE_DATE'  : $('#issue_due_date'),
+        'ORDER'           : $('#issue_custom_field_values_16'),
+        'CATEGORY_ID'     : $('#issue_category_id'),
+        'TAG'             : $('#issue_custom_field_values_1'),
+        'DESCRIPTION'     : $('#issue_description_and_toolbar'),
+        'SPENT_TIME'      : $('#time_entry_hours'),
+        'TIME_COMMENT'    : $('#time_entry_comments'),
+        'NOTES'           : $('#issue_notes'),
+        'PRIVATE_NOTES'   : $('#issue_private_notes')
+    };
+    FIELDS.ASSIGNEE.css('width', '60%');
+    FIELDS.ASSIGNEE.select2();
+    // set default values
+    FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
+    FIELDS.TIME_TYPE.val('Regular'); //type: regular
+// hide fields
+    FIELDS.ISSUE_START_DATE.parent().hide(); // issue start date
+    FIELDS.ISSUE_DUE_DATE.parent().hide(); //issue end date
+    FIELDS.ORDER.parent().hide(); //order
+    FIELDS.CATEGORY_ID.parent().hide(); // category ID
+    FIELDS.TAG.parent().hide(); //tag
+    FIELDS.DESCRIPTION.parent().hide(); //description
+}
 
 /**
  * Get my role
@@ -394,6 +416,23 @@ unsafeWindow.startTesting = function() {
     unsafeWindow.startProgress();
 }
 
+/**
+ * Rewritten function from redmine core
+ *
+ * @param url
+ */
+unsafeWindow.updateIssueFrom = function(url) {
+    unsafeWindow.jQuery.ajax({
+        url: url,
+        type: 'post',
+        data: $('#issue-form').serialize()
+    }).done(function() {
+        setTimeout(function() {
+            initFormElements();
+        }, 200);
+    });
+}
+
 function formPrepareToShowInPopup() {
     FIELDS.TRACKER.parent().hide();
     FIELDS.SUBJECT.parent().hide();
@@ -401,6 +440,7 @@ function formPrepareToShowInPopup() {
     FIELDS.VERSION.parent().hide();
     FIELDS.PARENT.parent().hide();
     FIELDS.ESTIMATE.parent().hide();
+    $('.jstEditor>.jstElements').hide();
     $('#attachments_fields').parents('fieldset').hide();
     $('#update').show();
     $('#update h3').hide();
@@ -518,22 +558,56 @@ unsafeWindow.assignToMe = function() {
  * Log time from timer
  */
 unsafeWindow.logTimerTime = function() {
-    return false; // @todo fix this feature
+    if ($('#log_time_container').length > 0 ){
+        return _showLogTimePopup();
+    } else {
+        $.ajax({
+            url: location.href + '/time_entries/new',
+            dataType: 'text'
+        }).done(function(data) {
+            $('body').append('<div id="log_time_container"></div>');
+            $('#log_time_container').append($(data).find('#content').children()).hide();
+            $('#new_time_entry #time_entry_issue_id').parent().hide();
+            $('#new_time_entry input[type=submit]:first').addClass('btn btn-primary').val('Log Time');
+            $('#new_time_entry input[type=submit]:last').hide();
+            setTimeout(function() {
+                $('#new_time_entry #time_entry_activity_id').val(getDefaultActivity());
+            }, 0);
+            $('#new_time_entry #time_entry_custom_field_values_12').val('Regular');
+            // initialize datepicker (copied from redmine source)
+            var datepickerOptions={dateFormat: 'yy-mm-dd', firstDay: 0, showOn: 'button', buttonImageOnly: true, buttonImage: '/images/calendar.png?1370089946', showButtonPanel: true, showWeek: true, showOtherMonths: true, selectOtherMonths: true};
+            unsafeWindow.$('#time_entry_spent_on').datepicker(datepickerOptions);
+            _showLogTimePopup();
+        });
+    }
+
+}
+
+/**
+ * Show log time popup
+ * @private
+ */
+function _showLogTimePopup() {
+    $('#log_time_container').show();
     unsafeWindow.jQuery.fancybox(   {
-        'type': 'ajax',
-        'href': location.href + '/time_entries/new#content',
+        'type': 'inline',
+        'content': '#log_time_container',
         'autoScale': false,
         'autoDimensions': false,
-        'width':'800',
-        'height': '700',
+        'width':'600',
+        'height': '250',
         'onComplete': function() {
-            $('#new_time_entry').on('submit.resolve', function() {
+            setTimeout(function() {
+                $('#new_time_entry #time_entry_hours').val(getTimerTime());
+            }, 0);
+            $('#new_time_entry').on('submit.log_time', function() {
                 stopTimer();
                 startTimer();
             });
         },
         'onClosed': function() {
-            $('#issue-form').off('.resolve');
+            $('#new_time_entry').off('.log_time');
+            $('#log_time_container').hide();
         }
     });
 }
@@ -553,7 +627,7 @@ function showTotalRegularTime() {
     var url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on&op' +
         '[spent_on]=*&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
     $.get(url).done( function( data ) {
-        $( "td.spent-time" ).append(' (R: ' + _parseRedmineHours(data) + ')' );
+        $( "td.spent-time" ).append(' (R: <a href="' + url + '">' + _parseRedmineHours(data) + '</a>)' );
     });
 }
 
@@ -565,19 +639,20 @@ function showMyTime() {
         '<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">loading...</td></tr>').insertAfter($('th.spent-time').parent());
     var totalHours, regularHours, fuckupHours;
     totalHours = regularHours = fuckupHours = '0';
-    var url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+    var tUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
         '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me';
-    $.get(url).done( function( data ) {
+    $.get(tUrl).done( function( data ) {
         totalHours = _parseRedmineHours(data);
-        url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+        var rUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
             '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
-        $.get(url).done( function( data ) {
+        $.get(rUrl).done( function( data ) {
             regularHours = _parseRedmineHours(data);
-            url = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+            var fUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
                 '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
-            $.get(url).done( function( data ) {
+            $.get(fUrl).done( function( data ) {
                 fuckupHours = _parseRedmineHours(data);
-                $('td.spent-by-me').html(totalHours + ' hours (R: ' + regularHours + ', F: ' + fuckupHours + ')');
+                $('td.spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
+                    + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
             });
         });
     });
@@ -595,16 +670,7 @@ function _parseRedmineHours(data) {
     return result[1] + result[2];
 }
 
-// set default values
-FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
-FIELDS.TIME_TYPE.val('Regular'); //type: regular
-// hide fields
-FIELDS.ISSUE_START_DATE.parent().hide(); // issue start date
-FIELDS.ISSUE_DUE_DATE.parent().hide(); //issue end date
-FIELDS.ORDER.parent().hide(); //order
-FIELDS.CATEGORY_ID.parent().hide(); // category ID
-FIELDS.TAG.parent().hide(); //tag
-FIELDS.DESCRIPTION.parent().hide(); //description
+initFormElements();
 
 
 //change link styles
