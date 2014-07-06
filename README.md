@@ -18,10 +18,10 @@ Features
 --------
 
 * Oggetto Redmine workflow particular support (Start Progress|Continue -> Froze|Resolve Issue -> Review Pased|Review Failed -> Test Passed|Test Failed -> Closed)
-* Quick Issue updates in popup for workflow
+* Quick Issue updates in a popup for the workflow
 * One-click "Assign to me"
 * Easy select for asignee with text-filter (uses [Select2](http://ivaynberg.github.io/select2/))
-* Removed obligatory fields from issue update form
+* Flag to hide obligatory fields from issue update form
 * User role configuration and separate workflows for each role
 * Default value for Log time "Activity" according to user role
 * Default value for Log time "Time" is "Regular"
@@ -37,4 +37,5 @@ Roadmap
 * ~~Review passed/Review failed buttons to workflow~~
 * ~~User role configuration and separate workflows for each role~~
 * Comment markup preview in popup
-* Fix double toolbar
+* ~~Fix double toolbar~~
+* Log time update in a popup

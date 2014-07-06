@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.3
+// @version     1.3.4
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -115,12 +115,84 @@ function initFormElements() {
     FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
     FIELDS.TIME_TYPE.val('Regular'); //type: regular
 // hide fields
-    FIELDS.ISSUE_START_DATE.parent().hide(); // issue start date
-    FIELDS.ISSUE_DUE_DATE.parent().hide(); //issue end date
-    FIELDS.ORDER.parent().hide(); //order
-    FIELDS.CATEGORY_ID.parent().hide(); // category ID
-    FIELDS.TAG.parent().hide(); //tag
-    FIELDS.DESCRIPTION.parent().hide(); //description
+    hideFields();
+}
+
+/**
+ * Hide form fields
+ *
+ * @return void
+ */
+function hideFields(force) {
+    if (typeof(force) === 'undefined') {
+        force = false;
+    }
+    if (!canHideFields() && !force) {
+        return;
+    }
+    FIELDS.ISSUE_START_DATE.parent().hide();
+    FIELDS.ISSUE_DUE_DATE.parent().hide();
+    FIELDS.ORDER.parent().hide();
+    FIELDS.CATEGORY_ID.parent().hide();
+    FIELDS.TAG.parent().hide();
+    FIELDS.DESCRIPTION.parent().hide();
+    FIELDS.TRACKER.parent().hide();
+    FIELDS.SUBJECT.parent().hide();
+    FIELDS.PRIORITY.parent().hide();
+    FIELDS.VERSION.parent().hide();
+    FIELDS.PARENT.parent().hide();
+    FIELDS.ESTIMATE.parent().hide();
+}
+
+/**
+ * Show form fields
+ *
+ * @return void
+ */
+function showFields() {
+    if (canHideFields()) {
+        return;
+    }
+    FIELDS.ISSUE_START_DATE.parent().show();
+    FIELDS.ISSUE_DUE_DATE.parent().show();
+    FIELDS.ORDER.parent().show();
+    FIELDS.CATEGORY_ID.parent().show();
+    FIELDS.TAG.parent().show();
+    FIELDS.DESCRIPTION.parent().show();
+    FIELDS.TRACKER.parent().show();
+    FIELDS.SUBJECT.parent().show();
+    FIELDS.PRIORITY.parent().show();
+    FIELDS.VERSION.parent().show();
+    FIELDS.PARENT.parent().show();
+    FIELDS.ESTIMATE.parent().show();
+}
+
+/**
+ * Add hide fields element and add observers
+ *
+ * @return void
+ */
+function addHideFormFieldsControl() {
+    $('#update h3').append('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> Hide Workflow Unrelated Fields</label>');
+    $checkbox = $('#conf-hide_fieds');
+    $checkbox.prop('checked', canHideFields());
+    $checkbox.change(function() {
+        GM_setValue('conf_hide_fields', $(this).prop('checked'));
+        if (canHideFields()) {
+            hideFields();
+        } else {
+            showFields();
+        }
+    });
+}
+
+/**
+ * Can hide fields
+ *
+ * @returns {boolean}
+ */
+function canHideFields() {
+    return GM_getValue('conf_hide_fields', true);
 }
 
 /**
@@ -434,13 +506,10 @@ unsafeWindow.updateIssueFrom = function(url) {
 }
 
 function formPrepareToShowInPopup() {
-    FIELDS.TRACKER.parent().hide();
-    FIELDS.SUBJECT.parent().hide();
-    FIELDS.PRIORITY.parent().hide();
-    FIELDS.VERSION.parent().hide();
-    FIELDS.PARENT.parent().hide();
-    FIELDS.ESTIMATE.parent().hide();
-    $('.jstEditor>.jstElements').hide();
+    setTimeout(function() {
+        hideFields(true);
+    }, 0);
+
     $('#attachments_fields').parents('fieldset').hide();
     $('#update').show();
     $('#update h3').hide();
@@ -448,16 +517,13 @@ function formPrepareToShowInPopup() {
 }
 
 function formReturnToPreviousStateAfterPopupClose() {
-    FIELDS.TRACKER.parent().show();
-    FIELDS.SUBJECT.parent().show();
-    FIELDS.PRIORITY.parent().show();
-    FIELDS.VERSION.parent().show();
-    FIELDS.PARENT.parent().show();
-    FIELDS.ESTIMATE.parent().show();
+    setTimeout(function() {
+        showFields();
+    }, 0);
     $('#attachments_fields').parents('fieldset').show();
     $('#update').hide();
     $('.form-preview-btn').show();
-    $('#update h3').show();
+    $('#update h3').show().parent().parent().css({'width':'auto', 'height': 'auto'});
     FIELDS.SPENT_TIME.val('');
     FIELDS.TIME_COMMENT.val('');
     FIELDS.PRIVATE_NOTES.prop('checked', false);
@@ -480,6 +546,7 @@ unsafeWindow.resolveIssue = function() {
         'width':'800',
         'height': '700',
         'onComplete': function() {
+                $('.jstEditor>.jstElements').hide();
                 $('#issue-form').on('submit.resolve', function() {
                 stopTimer();
             });
@@ -509,6 +576,7 @@ function _showReviewResultPopup() {
         'width': '800',
         'height': '700',
         'onClosed': function () {
+            $('.jstEditor>.jstElements').hide();
             formReturnToPreviousStateAfterPopupClose();
             $('#issue-form').off('.reviewResult');
         },
@@ -637,24 +705,18 @@ function showTotalRegularTime() {
 function showMyTime() {
     $('<tr><th></th><td></td>' +
         '<th class="spent-by-me">Spent by me:</th><td class="spent-by-me">loading...</td></tr>').insertAfter($('th.spent-time').parent());
-    var totalHours, regularHours, fuckupHours;
-    totalHours = regularHours = fuckupHours = '0';
-    var tUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
+    var totalHours = 0 , regularHours = 0, fuckupHours = 0;
+    var baseUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
         '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me';
-    $.get(tUrl).done( function( data ) {
-        totalHours = _parseRedmineHours(data);
-        var rUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
-            '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
-        $.get(rUrl).done( function( data ) {
-            regularHours = _parseRedmineHours(data);
-            var fUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
-                '&op[spent_on]=*&f[]=user_id&op[user_id]=%3D&v[user_id][]=me&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
-            $.get(fUrl).done( function( data ) {
-                fuckupHours = _parseRedmineHours(data);
-                $('td.spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
-                    + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
-            });
-        });
+    var tUrl = baseUrl;
+    var rUrl = baseUrl + '&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Regular';
+    var fUrl = baseUrl + '&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=Fuc%25up';
+    $.when($.get(tUrl), $.get(rUrl), $.get(fUrl)).done(function (tData, rData, fData) {
+        totalHours = _parseRedmineHours(tData[0]);
+        regularHours = _parseRedmineHours(rData[0]);
+        fuckupHours = _parseRedmineHours(fData[0]);
+        $('td.spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
+            + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
     });
 }
 
@@ -719,6 +781,7 @@ if (isAssignedToMe) {
 
 showTotalRegularTime();
 showMyTime();
+addHideFormFieldsControl();
 
 if (!GM_getValue('user_role')) {
     showConfig();
