@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.4
+// @version     1.3.5
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -211,6 +211,14 @@ function getMyRole() {
 function isReviewer() {
     return GM_getValue('is_reviewer', false);
 }
+/**
+ * Is Project Manager
+ *
+ * @returns {boolean}
+ */
+function isPM() {
+    return (getMyRole() == ROLES.PM);
+}
 
 /**
  * Get default activity
@@ -325,7 +333,7 @@ function canStartTest() {
  * @returns {boolean}
  */
 function canClose() {
-    return (currentStatus == STATUS.RESOLVED.TEXT && getMyRole() == ROLES.PM)
+    return (currentStatus == STATUS.RESOLVED.TEXT && isPM())
 }
 
 /**
@@ -739,7 +747,12 @@ initFormElements();
 
 $buttonsContainer.addClass('btn-group');
 $buttonsContainer.children().addClass('btn btn-default');
-$('a.icon-copy').remove();
+if (!isPM()) {
+    $('a.icon-copy').remove();
+    $('a.icon-del').remove();
+} else {
+    $('a.icon-del').prepend('<span class="glyphicon glyphicon-trash"></span> ');
+}
 $('a.icon-edit').prepend('<span class="glyphicon glyphicon-pencil"></span> ').append('…');
 $('a.icon-time-add').prepend('<span class="glyphicon glyphicon-time"></span> ');
 $('a.icon-fav-off').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
