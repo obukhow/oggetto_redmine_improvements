@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.5
+// @version     1.3.6
 // @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -543,7 +543,6 @@ function formReturnToPreviousStateAfterPopupClose() {
  * Resolve issue
  */
 unsafeWindow.resolveIssue = function() {
-    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
     formPrepareToShowInPopup();
     FIELDS.SPENT_TIME.val(getTimerTime());
     unsafeWindow.jQuery.fancybox({
@@ -554,6 +553,7 @@ unsafeWindow.resolveIssue = function() {
         'width':'800',
         'height': '700',
         'onComplete': function() {
+                FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
                 $('.jstEditor>.jstElements').hide();
                 $('#issue-form').on('submit.resolve', function() {
                 stopTimer();
@@ -571,7 +571,7 @@ unsafeWindow.resolveIssue = function() {
  *
  * @private
  */
-function _showReviewResultPopup() {
+function _showReviewResultPopup(status) {
     FIELDS.SPENT_TIME.val(getTimerTime());
     FIELDS.TIME_COMMENT.val('Проверка кода по пул-реквесту');
     FIELDS.PRIVATE_NOTES.prop('checked', true);
@@ -589,6 +589,7 @@ function _showReviewResultPopup() {
             $('#issue-form').off('.reviewResult');
         },
         'onComplete': function() {
+            FIELDS.STATUS.val(status);
             $('#issue-form').on('submit.reviewResult', function() {
                 GM_deleteValue(issueID + '_review');
             });
@@ -599,9 +600,8 @@ function _showReviewResultPopup() {
  * Review Passed
  */
 unsafeWindow.reviewPassed = function() {
-    FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
     FIELDS.NOTES.val('Review Passed');
-    _showReviewResultPopup();
+    _showReviewResultPopup(STATUS.RESOLVED.VALUE);
 }
 
 /**
@@ -609,8 +609,7 @@ unsafeWindow.reviewPassed = function() {
  */
 unsafeWindow.reviewFailed = function() {
     FIELDS.NOTES.val('Комментарии к пулл-реквесту');
-    FIELDS.STATUS.val(STATUS.REVIEW_FAILED.VALUE);
-    _showReviewResultPopup();
+    _showReviewResultPopup(STATUS.REVIEW_FAILED.VALUE);
 }
 
 /**
