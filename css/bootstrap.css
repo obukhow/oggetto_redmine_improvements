@@ -423,10 +423,10 @@ select[multiple].input-lg {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  -webkit-transition-property: all;
-  -moz-transition-property: all;
-  -o-transition-property: all;
-  transition-property: all;
+  -webkit-transition-property: border-color, background-color, color;
+  -moz-transition-property: border-color, background-color, color;
+  -o-transition-property: border-color, background-color, color;
+  transition-property: border-color, background-color, color;
   -webkit-transition-duration: 0.5s;
   -moz-transition-duration: 0.5s;
   -o-transition-duration: 0.5s;
