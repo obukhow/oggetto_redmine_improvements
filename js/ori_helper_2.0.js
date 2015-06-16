@@ -1,4 +1,4 @@
-function showOriFancybox(status, options) {
+function showOriFancybox(options) {
     var defaults = {
         'type': 'inline',
         'content': '#update',
