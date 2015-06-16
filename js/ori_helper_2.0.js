@@ -1,7 +1,7 @@
-function showOriFancybox(status) {
+function showOriFancybox(status, content) {
     jQuery.fancybox({
         'type': 'inline',
-        'content': '#update',
+        'content': content,
         'autoScale': false,
         'autoDimensions': false,
         'width': '800',
