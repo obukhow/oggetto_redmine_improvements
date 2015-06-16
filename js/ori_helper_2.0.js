@@ -1,5 +1,5 @@
 function showOriFancybox(status) {
-    unsafeWindow.jQuery.fancybox({
+    jQuery.fancybox({
         'type': 'inline',
         'content': '#update',
         'autoScale': false,
