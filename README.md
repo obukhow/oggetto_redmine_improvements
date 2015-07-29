@@ -8,15 +8,15 @@ Oggetto Web Redmine Improvement Greasemonkey/Tampermonkey User Script
 ### Step 1
 Install Greasemonkey or Tampermonkey for your browser:
 
-<a class="btn btn-sm js-menu-target css-truncate" href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/"><span class="octicon octicon-browser"></span>Mozilla Firefox</a>
+<a class="btn btn-sm js-menu-target css-truncate" href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/">>Mozilla Firefox</a>
 
-<a class="btn btn-sm js-menu-target css-truncate" href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo"><span class="octicon octicon-browser"></span>Google Chrome</a>
+<a class="btn btn-sm js-menu-target css-truncate" href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo">Google Chrome</a>
 
 ### Step 2
 
 Install script to your browser.
 
-<a class="btn btn-sm js-menu-target css-truncate" href="https://github.com/obukhow/oggetto_redmine_improvements/raw/master/ori.user.js"><span class="octicon octicon-browser"></span>Install</a>
+<a class="btn btn-sm js-menu-target css-truncate" href="https://github.com/obukhow/oggetto_redmine_improvements/raw/master/ori.user.js">Install</a>
 
 
 ![Redmine Improvement Image](http://i.imgur.com/IYRWTC7.jpg)
