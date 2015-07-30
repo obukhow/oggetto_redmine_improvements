@@ -10,9 +10,9 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     1.3.9
+// @version     1.4.0
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
+// @resource    bootstrap_CSS1 https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @grant       unsafeWindow
 // @grant       GM_getValue
@@ -23,9 +23,9 @@
 // @grant       GM_listValues
 // ==/UserScript==
 var select4_CssSrc = GM_getResourceText ("select4_CSS");
-var bootstrap_CssSrc = GM_getResourceText ("bootstrap_CSS");
+var bootstrap_CssSrc1 = GM_getResourceText ("bootstrap_CSS1");
 GM_addStyle (select4_CssSrc);
-GM_addStyle (bootstrap_CssSrc);
+GM_addStyle (bootstrap_CssSrc1);
 GM_addStyle ("@font-face {"+
     "font-family: 'Glyphicons Halflings';"+
     "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot');" +
@@ -740,7 +740,7 @@ function showMyTime() {
  */
 function addRtfBfqTime() {
 
-    $('td.spent-time').prepend('<span id="rtfbfq" class="glyphicon glyphicon-th" aria-hidden="true" data-html="true" data-trigger="hover" data-toggle="popover" data-content="Loading..."></span>');
+    $('td.spent-time').prepend('<span id="rtfbfq" class="glyphicon glyphicon-refresh rotation" aria-hidden="true" data-html="true" data-trigger="hover" data-toggle="popover" data-content="Loading..."></span>');
 
     $(function () {
         $('[data-toggle="popover"]').popover();
@@ -757,8 +757,10 @@ function addRtfBfqTime() {
  */
 function insertRtfBfqTable(data) {
     var time = {RB: 0, RF: 0, RT:0, TB: 0, TF: 0, TT: 0, FB: 0, FF: 0, FT: 0};
+    var element = document.getElementById('rtfbfq');
     $.extend(time, data);
-    document.getElementById('rtfbfq').dataset.content = '<table class="rtfbfq">' +
+    $(element).removeClass('glyphicon-refresh').addClass('glyphicon-th').removeClass('rotation');
+    element.dataset.content = '<table class="rtfbfq">' +
         '<tr><td></td><td class="rtfbfqHeader">B</td><td class="rtfbfqHeader">F</td><td class="rtfbfqHeader">Q</td></tr>' +
         '<tr><td class="rtfbfqHeader">R</td><td>' + time.RB + '</td><td>' + time.RF + '</td><td>' + time.RT + '</td></tr>' +
         '<tr><td class="rtfbfqHeader">T</td><td>' + time.TB + '</td><td>' + time.TF + '</td><td>' + time.TT + '</td></tr>' +
