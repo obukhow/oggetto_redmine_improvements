@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     1.3.8
+// @version     1.3.9
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -90,6 +90,7 @@ var $buttonsContainer = $('a.icon-edit').parent();
 function initFormElements() {
     FIELDS = {
         'TRACKER'         : $('#issue_tracker_id'),
+        'PROJECT'         : $('#issue_project_id'),
         'SUBJECT'         : $('#issue_subject'),
         'PRIORITY'        : $('#issue_priority_id'),
         'PARENT'          : $('#issue_parent_issue_id'),
@@ -108,7 +109,8 @@ function initFormElements() {
         'SPENT_TIME'      : $('#time_entry_hours'),
         'TIME_COMMENT'    : $('#time_entry_comments'),
         'NOTES'           : $('#issue_notes'),
-        'PRIVATE_NOTES'   : $('#issue_private_notes')
+        'PRIVATE_NOTES'   : $('#issue_private_notes'),
+        'PRIVATE_FLAG'    : $('#issue_is_private')
     };
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2();
@@ -134,6 +136,8 @@ function hideFields(force) {
     FIELDS.ISSUE_START_DATE.parent().hide();
     FIELDS.ISSUE_DUE_DATE.parent().hide();
     FIELDS.ORDER.parent().hide();
+    FIELDS.PROJECT.parent().hide();
+    FIELDS.PRIVATE_FLAG.parent().hide();
     FIELDS.CATEGORY_ID.parent().hide();
     FIELDS.TAG.parent().hide();
     FIELDS.DESCRIPTION.parent().hide();
@@ -157,6 +161,8 @@ function showFields() {
     FIELDS.ISSUE_START_DATE.parent().show();
     FIELDS.ISSUE_DUE_DATE.parent().show();
     FIELDS.ORDER.parent().show();
+    FIELDS.PROJECT.parent().show();
+    FIELDS.PRIVATE_FLAG.parent().show();
     FIELDS.CATEGORY_ID.parent().show();
     FIELDS.TAG.parent().show();
     FIELDS.DESCRIPTION.parent().show();
