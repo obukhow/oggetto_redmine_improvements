@@ -6,12 +6,12 @@
 // @downloadURL https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
 // @updateURL   https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
 // @include     http://redmine.oggettoweb.com/issues/*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
-// @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.js
-// @require     http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2_locale_ru.js
+// @require     https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
-// @version     1.3.7
-// @resource    select2_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.css
+// @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
+// @version     1.3.8
+// @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @grant       unsafeWindow
@@ -22,20 +22,21 @@
 // @grant       GM_registerMenuCommand
 // @grant       GM_listValues
 // ==/UserScript==
-var select2_CssSrc = GM_getResourceText ("select2_CSS");
+var select4_CssSrc = GM_getResourceText ("select4_CSS");
 var bootstrap_CssSrc = GM_getResourceText ("bootstrap_CSS");
-GM_addStyle (select2_CssSrc);
+GM_addStyle (select4_CssSrc);
 GM_addStyle (bootstrap_CssSrc);
 GM_addStyle ("@font-face {"+
-  "font-family: 'Glyphicons Halflings';"+
-  "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot');" +
-  "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');"+
-"}");
+    "font-family: 'Glyphicons Halflings';"+
+    "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot');" +
+    "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.woff') format('woff'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('http://netdna.bootstrapcdn.com/bootstrap/3.1.1/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');"+
+    "}");
 GM_addStyle (".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
 GM_addStyle (".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;}");
 GM_addStyle ("#content h2{line-height:40px;");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
+GM_addStyle ("table.rtfbfq {text-align:right; border:1px solid #fff;} .rtfbfqHeader {font-weight:bold; text-align:center; color: #DDD; min-width: 20px;}");
 
 // variables
 
@@ -252,16 +253,16 @@ function addButton(text, action, className, icon) {
  * @returns {string}
  */
 function getStartProgressText() {
-     if (isTimerStarted()) {
-         return 'Continue Progress';
-     }
-     if (getMyRole() == ROLES.QA) {
-         return 'Start Testing';
-     }
-     if (canDoReview()) {
-         return 'Start Review';
-     }
-     return 'Start Progress';
+    if (isTimerStarted()) {
+        return 'Continue Progress';
+    }
+    if (getMyRole() == ROLES.QA) {
+        return 'Start Testing';
+    }
+    if (canDoReview()) {
+        return 'Start Review';
+    }
+    return 'Start Progress';
 }
 
 /**
@@ -312,10 +313,10 @@ function showConfig() {
  */
 function canStartProgress() {
     return (currentStatus == STATUS.NEW.TEXT ||
-        currentStatus == STATUS.FEEDBACK.TEXT ||
-        currentStatus == STATUS.REVIEW_FAILED.TEXT ||
-        currentStatus == STATUS.VERIFY_FAILED.TEXT ||
-        currentStatus == STATUS.FROZEN.TEXT);
+    currentStatus == STATUS.FEEDBACK.TEXT ||
+    currentStatus == STATUS.REVIEW_FAILED.TEXT ||
+    currentStatus == STATUS.VERIFY_FAILED.TEXT ||
+    currentStatus == STATUS.FROZEN.TEXT);
 }
 
 /**
@@ -553,9 +554,9 @@ unsafeWindow.resolveIssue = function() {
         'width':'800',
         'height': '700',
         'onComplete': function() {
-                FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
-                $('.jstEditor>.jstElements').hide();
-                $('#issue-form').on('submit.resolve', function() {
+            FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
+            $('.jstEditor>.jstElements').hide();
+            $('#issue-form').on('submit.resolve', function() {
                 stopTimer();
             });
         },
@@ -725,6 +726,38 @@ function showMyTime() {
         $('td.spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
             + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
     });
+    addRtfBfqTime();
+}
+
+/**
+ * Show table with Regular, Team-fuckup, Fuckup time for Back, Front, Testing
+ */
+function addRtfBfqTime() {
+
+    $('td.spent-time').prepend('<span id="rtfbfq" class="glyphicon glyphicon-th" aria-hidden="true" data-html="true" data-trigger="hover" data-toggle="popover" data-content="Loading..."></span>');
+
+    $(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+    $.ajax({
+        url: 'http://new.oggy.co/api/timeEntry?id=' + issueID,
+        dataType: 'jsonp',
+        jsonpCallback: 'insertRtfBfqTable'
+    });
+}
+
+/**
+ * Insert
+ */
+function insertRtfBfqTable(data) {
+    var time = {RB: 0, RF: 0, RT:0, TB: 0, TF: 0, TT: 0, FB: 0, FF: 0, FT: 0};
+    $.extend(time, data);
+    document.getElementById('rtfbfq').dataset.content = '<table class="rtfbfq">' +
+        '<tr><td></td><td class="rtfbfqHeader">B</td><td class="rtfbfqHeader">F</td><td class="rtfbfqHeader">Q</td></tr>' +
+        '<tr><td class="rtfbfqHeader">R</td><td>' + time.RB + '</td><td>' + time.RF + '</td><td>' + time.RT + '</td></tr>' +
+        '<tr><td class="rtfbfqHeader">T</td><td>' + time.TB + '</td><td>' + time.TF + '</td><td>' + time.TT + '</td></tr>' +
+        '<tr><td class="rtfbfqHeader">F</td><td>' + time.FB + '</td><td>' + time.FF + '</td><td>' + time.FT + '</td></tr>' +
+        '</table>';
 }
 
 /**
@@ -790,6 +823,7 @@ if (isAssignedToMe) {
     addButton('Assign To Me', 'assignToMe()', 'btn-primary', 'glyphicon-user');
 }
 
+exportFunction(insertRtfBfqTable, unsafeWindow, {defineAs: "insertRtfBfqTable"});
 
 showTotalRegularTime();
 showMyTime();
