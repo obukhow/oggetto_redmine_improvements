@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     1.4.0
+// @version     1.4.1
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap_CSS1 https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -36,7 +36,7 @@ GM_addStyle (".select2-container .select2-choice {height: auto; line-height: 1.4
 GM_addStyle ("#content h2{line-height:40px;");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle ("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
-GM_addStyle ("table.rtfbfq {text-align:right; border:1px solid #fff;} .rtfbfqHeader {font-weight:bold; text-align:center; color: #DDD; min-width: 20px;}");
+GM_addStyle ("table.rtfbfq {text-align:center; border:1px solid #fff;} .rtfbfqHeader {font-weight:bold; text-align:center; color: #DDD; min-width: 20px;}");
 
 // variables
 
