@@ -559,7 +559,7 @@ select[multiple].input-lg {
 	cursor:pointer;
 }
 .dropdown-menu .sub-menu {
-    left: 100%;
+    left: -100%;
     position: absolute;
     top: 0;
     display:none;
@@ -569,29 +569,29 @@ select[multiple].input-lg {
 	border-left-color:#fff;
 	box-shadow:none;
 }
-.right-caret:after
+.right-caret:before
  {	content:"";
     border-bottom: 4px solid transparent;
     border-top: 4px solid transparent;
-    border-left: 4px solid orange;
+    border-left: 4px solid #ccc;
     display: inline-block;
     height: 0;
     opacity: 0.8;
     vertical-align: middle;
     width: 0;
-	margin-left:5px;
+	margin-right:5px;
 }
-.left-caret:after
+.left-caret:before
 {	content:"";
     border-bottom: 4px solid transparent;
     border-top: 4px solid transparent;
-    border-right: 4px solid orange;
+    border-right: 4px solid #ccc;
     display: inline-block;
     height: 0;
     opacity: 0.8;
     vertical-align: middle;
     width: 0;
-	margin-left:5px;
+	margin-right:5px;
 }
 .btn {
   display: inline-block;
