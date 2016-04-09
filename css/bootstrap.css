@@ -579,7 +579,7 @@ select[multiple].input-lg {
     opacity: 0.8;
     vertical-align: middle;
     width: 0;
-	margin-right:5px;
+    margin-right:15px;
 }
 .left-caret:before
 {	content:"";
@@ -591,7 +591,7 @@ select[multiple].input-lg {
     opacity: 0.8;
     vertical-align: middle;
     width: 0;
-	margin-right:5px;
+    margin-right:10px;
 }
 .btn {
   display: inline-block;
