@@ -327,7 +327,7 @@ function addMoreButton() {
         '</a>' +
         '<ul class="dropdown-menu pull-right" aria-labelledby="moreMenu" id="moreMenuList">' +
         '<li role="separator" class="divider"></li>' +
-        '<li><a href="#" onclick="showConfig(); return false;"><span class="glyphicon glyphicon-th"></span> ' + TEXT.ROLE_SETTINGS + '</a></li>' +
+        '<li><a href="#" onclick="showConfig(); return false;"><span class="glyphicon glyphicon-cog"></span> ' + TEXT.ROLE_SETTINGS + '</a></li>' +
         '</ul>';
     $('.btn-group').not('.manage-issue-buttons').first().append(buttonHtml);
     if ($('a.icon-del')) {
