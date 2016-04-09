@@ -564,9 +564,9 @@ select[multiple].input-lg {
     top: 0;
     display:none;
     margin-top: -1px;
-	border-top-left-radius:0;
-	border-bottom-left-radius:0;
-	border-left-color:#fff;
+	border-top-right-radius:0;
+	border-bottom-right-radius:0;
+	border-right-color:#fff;
 	box-shadow:none;
 }
 .right-caret:before
