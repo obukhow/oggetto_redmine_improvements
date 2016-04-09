@@ -945,6 +945,9 @@ input[type="button"].btn-block {
 .glyphicon-asterisk:before {
   content: "\2a";
 }
+.glyphicon-duplicate:before {
+  content: "\e224";
+}
 .glyphicon-plus:before {
   content: "\2b";
 }
