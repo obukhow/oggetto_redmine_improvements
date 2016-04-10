@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.0
+// @version     2.0.1
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2000
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -35,7 +35,7 @@ GM_addStyle("@font-face {" +
     "url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');" +
     "}");
 GM_addStyle(".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
-GM_addStyle(".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;}");
+GM_addStyle(".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;} .select2-container--open{ z-index:10000;} .fancybox-content .select2-container--below {width: 90% !important;}");
 GM_addStyle("#content h2{line-height:40px;");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
