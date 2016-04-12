@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.1
+// @version     2.0.2
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2000
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -399,6 +399,24 @@ function getStartProgressText() {
         return TEXT.START_REVIEW;
     }
     return TEXT.START_PROGRESS;
+}
+
+/**
+ * get start progress button text
+ *
+ * @returns {string}
+ */
+function getStartProgressFunction() {
+    if (isTimerStarted()) {
+        return camelCase(EN_TEXT.CONTINUE_PROGRESS);
+    }
+    if (getMyRole() == ROLES.QA) {
+        return camelCase(EN_TEXT.START_TESTING);
+    }
+    if (canDoReview()) {
+        return camelCase(EN_TEXT.START_REVIEW);
+    }
+    return camelCase(EN_TEXT.START_PROGRESS);
 }
 
 /**
@@ -1000,7 +1018,7 @@ $('#issue-form input[type=submit]').next().addClass('btn btn-primary form-previe
 if (isAssignedToMe) {
     if (canStartProgress()) {
         var text = getStartProgressText();
-        addButton(text, camelCase(text) + '()', 'btn-success', 'glyphicon-play-circle');
+        addButton(text, getStartProgressFunction() + '()', 'btn-success', 'glyphicon-play-circle');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT) {
         if (isOnReview()) {
             addButton(TEXT.REVIEW_PASSED, 'reviewPassed()', 'btn-success', 'glyphicon-thumbs-up');
@@ -1017,7 +1035,7 @@ if (isAssignedToMe) {
         }
     } else if (canStartTest()) {
         var text = getStartProgressText();
-        addButton(text, camelCase(text) + '()', 'btn-success', 'glyphicon-play-circle');
+        addButton(text, getStartProgressFunction() + '()', 'btn-success', 'glyphicon-play-circle');
     } else if (canClose()) {
         addButton(TEXT.CLOSE_ISSUE, 'closeIssue()', 'btn-danger', 'glyphicon-remove');
     } else if (canDoReview()) {
