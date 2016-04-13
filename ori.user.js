@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.2
+// @version     2.0.3
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2000
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -172,7 +172,9 @@ function initFormElements() {
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
     );
-    if (document.location.href.indexOf('time_entries') == -1) {
+    if ((document.location.href.indexOf('time_entries') == -1) ||
+        (document.location.href.indexOf('time_entries') > 0 && document.location.href.indexOf('edit') == -1)
+    ) {
         // set default values
         FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
         FIELDS.TIME_TYPE.val(TIME_TYPE.REGULAR); //type: regular
