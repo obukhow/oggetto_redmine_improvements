@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.3
+// @version     2.0.4
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2000
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
@@ -71,7 +71,8 @@ var RU_TEXT = {
     SPENT_BY_ME: 'Затрачено мной',
     LOADING: 'загрузка...',
     MORE: 'Ещё ',
-    ROLE_SETTINGS: 'Настройки роли'
+    ROLE_SETTINGS: 'Настройки роли',
+    ONLY_WF_FIELDS: 'Только workflow',
 };
 
 var EN_TEXT = {
@@ -90,7 +91,8 @@ var EN_TEXT = {
     SPENT_BY_ME: 'Spent by me',
     LOADING: 'loading...',
     MORE: 'More ',
-    ROLE_SETTINGS: 'Role Settings'
+    ROLE_SETTINGS: 'Role Settings',
+    ONLY_WF_FIELDS: 'Only workflow fields',
 };
 
 var TEXT = ($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
@@ -243,7 +245,7 @@ function showFields() {
  * @return void
  */
 function addHideFormFieldsControl() {
-    $('#update h3').append('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> Hide Workflow Unrelated Fields</label>');
+    $('#update h3').append('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> ' + TEXT.ONLY_WF_FIELDS + '</label>');
     $checkbox = $('#conf-hide_fieds');
     $checkbox.prop('checked', canHideFields());
     $checkbox.change(function () {
