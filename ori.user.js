@@ -164,12 +164,17 @@ function initFormElements() {
         'ORDER': $('#issue_custom_field_values_16'),
         'CATEGORY_ID': $('#issue_category_id'),
         'TAG': $('#issue_custom_field_values_1'),
+        'BE_ESTIMATE': $('#issue_custom_field_values_18'),
+        'FE_ESTIMATE': $('#issue_custom_field_values_19'),
+        'TST_ESTIMATE': $('#issue_custom_field_values_20'),
+        'PM_ESTIMATE': $('#issue_custom_field_values_26'),
         'DESCRIPTION': $('#issue_description_and_toolbar'),
         'SPENT_TIME': $('#time_entry_hours'),
         'TIME_COMMENT': $('#time_entry_comments'),
         'NOTES': $('#issue_notes'),
         'PRIVATE_NOTES': $('#issue_private_notes'),
-        'PRIVATE_FLAG': $('#issue_is_private')
+        'PRIVATE_FLAG': $('#issue_is_private'),
+        'PAID': $('#time_entry_custom_field_values_32')
     };
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
@@ -212,6 +217,11 @@ function hideFields(force) {
     FIELDS.VERSION.parent().hide();
     FIELDS.PARENT.parent().hide();
     FIELDS.ESTIMATE.parent().hide();
+    FIELDS.BE_ESTIMATE.parent().hide();
+    FIELDS.FE_ESTIMATE.parent().hide();
+    FIELDS.TST_ESTIMATE.parent().hide();
+    FIELDS.PM_ESTIMATE.parent().hide();
+    FIELDS.PAID.parent().hide();
 }
 
 /**
@@ -237,6 +247,11 @@ function showFields() {
     FIELDS.VERSION.parent().show();
     FIELDS.PARENT.parent().show();
     FIELDS.ESTIMATE.parent().show();
+    FIELDS.BE_ESTIMATE.parent().show();
+    FIELDS.FE_ESTIMATE.parent().show();
+    FIELDS.TST_ESTIMATE.parent().show();
+    FIELDS.PM_ESTIMATE.parent().show();
+    FIELDS.PAID.parent().show();
 }
 
 /**
