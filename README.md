@@ -52,6 +52,6 @@ Roadmap
 Contributors
 -------
 
-| [![obukhow-image](https://avatars3.githubusercontent.com/u/621014?s=120&v=4)](https://github.com/obukhow) | [![VaD1ke-image](https://u.magento.com/media/certification/photo_2210084_1454006933.png)](https://github.com/VaD1ke) |
+| [![obukhow-image](https://avatars3.githubusercontent.com/u/621014?s=120&v=4)](https://github.com/obukhow) | [![VaD1ke-image](https://avatars2.githubusercontent.com/u/11317581?s=120&v=4)](https://github.com/VaD1ke) |
 | :---:                       | :---:                     |
 | [obukhow](https://github.com/obukhow)                 | [VaD1ke](https://github.com/VaD1ke)                | 
