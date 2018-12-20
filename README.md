@@ -47,3 +47,11 @@ Roadmap
 * Comment markup preview in popup
 * ~~Fix double toolbar~~
 * Log time update in a popup
+
+
+Contributors
+-------
+
+| [![obukhow-image](https://avatars3.githubusercontent.com/u/621014?s=120&v=4)](https://github.com/obukhow) | [![VaD1ke-image](https://avatars2.githubusercontent.com/u/11317581?s=120&v=4)](https://github.com/VaD1ke) |
+| :---:                       | :---:                     |
+| [obukhow](https://github.com/obukhow)                 | [VaD1ke](https://github.com/VaD1ke)                | 
