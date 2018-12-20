@@ -237,9 +237,18 @@ textarea.input-lg,
 select[multiple].input-lg {
   height: auto;
 }
+#issue_status_id,
+#issue_priority_id {
+  font-size: 13px;
+  background-color: #fff;
+}
 #attachments_fields {
   margin-top: -1rem;
   display: block;
+}
+.check_box_group {
+  padding-left: .7rem;
+  width: 80%;
 }
 .has-feedback {
   position: relative;
@@ -1889,3 +1898,10 @@ input[type="button"].btn-block {
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg)}}
+
+.select2-selection__rendered {
+  color: #000 !important;
+}
+.select2-selection__arrow b {
+  border-color: #555 transparent transparent transparent !important;
+}
