@@ -10,9 +10,9 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.6
+// @version     2.0.7
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2010
+// @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @grant       unsafeWindow
 // @grant       GM_getValue
@@ -164,10 +164,14 @@ function initFormElements() {
         'ORDER': $('#issue_custom_field_values_16'),
         'CATEGORY_ID': $('#issue_category_id'),
         'TAG': $('#issue_custom_field_values_1'),
+        'DESIGN_ESTIMATE': $('#issue_custom_field_values_17'),
         'BE_ESTIMATE': $('#issue_custom_field_values_18'),
         'FE_ESTIMATE': $('#issue_custom_field_values_19'),
         'TST_ESTIMATE': $('#issue_custom_field_values_20'),
+        'BA_ESTIMATE': $('#issue_custom_field_values_22'),
+        'SA_ESTIMATE': $('#issue_custom_field_values_23'),
         'PM_ESTIMATE': $('#issue_custom_field_values_26'),
+        'REVIEW_ESTIMATE': $('#issue_custom_field_values_37'),
         'DESCRIPTION': $('#issue_description_and_toolbar'),
         'SPENT_TIME': $('#time_entry_hours'),
         'TIME_COMMENT': $('#time_entry_comments'),
@@ -221,6 +225,10 @@ function hideFields(force) {
     FIELDS.FE_ESTIMATE.parent().hide();
     FIELDS.TST_ESTIMATE.parent().hide();
     FIELDS.PM_ESTIMATE.parent().hide();
+    FIELDS.REVIEW_ESTIMATE.parent().hide();
+    FIELDS.BA_ESTIMATE.parent().hide();
+    FIELDS.SA_ESTIMATE.parent().hide();
+    FIELDS.DESIGN_ESTIMATE.parent().hide();
     FIELDS.PAID.parent().hide();
 }
 
@@ -251,6 +259,10 @@ function showFields() {
     FIELDS.FE_ESTIMATE.parent().show();
     FIELDS.TST_ESTIMATE.parent().show();
     FIELDS.PM_ESTIMATE.parent().show();
+    FIELDS.REVIEW_ESTIMATE.parent().show();
+    FIELDS.BA_ESTIMATE.parent().show();
+    FIELDS.SA_ESTIMATE.parent().show();
+    FIELDS.DESIGN_ESTIMATE.parent().show();
     FIELDS.PAID.parent().show();
 }
 

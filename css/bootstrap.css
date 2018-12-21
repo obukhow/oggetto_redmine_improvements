@@ -240,7 +240,6 @@ select[multiple].input-lg {
 #issue_status_id,
 #issue_priority_id {
   font-size: 13px;
-  background-color: #fff;
 }
 #attachments_fields {
   margin-top: -1rem;
