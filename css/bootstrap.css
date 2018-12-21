@@ -46,7 +46,7 @@ hr {
 }
 fieldset {
   padding: 0;
-  margin: 0;
+  margin: 1rem 0;
   border: 0;
   min-width: 0;
 }
@@ -111,8 +111,7 @@ output {
   font-size: 14px;
   line-height: 1.42857143;
   color: #555555;
-  background-color: #ffffff;
-  background-image: none;
+  background: #ffffff none;
   border: 1px solid #cccccc;
   border-radius: 4px;
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -237,6 +236,19 @@ select.input-lg {
 textarea.input-lg,
 select[multiple].input-lg {
   height: auto;
+}
+#issue_status_id,
+#issue_priority_id {
+  font-size: 13px;
+  background-color: #fff;
+}
+#attachments_fields {
+  margin-top: -1rem;
+  display: block;
+}
+.check_box_group {
+  padding-left: .7rem;
+  width: 80%;
 }
 .has-feedback {
   position: relative;
@@ -1886,3 +1898,10 @@ input[type="button"].btn-block {
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg)}}
+
+.select2-selection__rendered {
+  color: #000 !important;
+}
+.select2-selection__arrow b {
+  border-color: #555 transparent transparent transparent !important;
+}
