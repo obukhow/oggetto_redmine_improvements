@@ -10,7 +10,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.1
+// @version     3.0.2
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=3
@@ -23,7 +23,58 @@
 // @grant       GM_getResourceText
 // @grant       GM_registerMenuCommand
 // @grant       GM_listValues
+// @run-at document-start
 // ==/UserScript==
+GM_addStyle(`
+body, html{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;font-size:14px;word-spacing:1px;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;box-sizing:border-box;
+color: #333333;}
+a, a:link, a:visited { color: #5579eb;}
+h1 {color:#5579eb;}
+h1, h2, h3, h4, h5 {font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif; }
+h2, .wiki h1 {
+    line-height: 2em;
+}
+#top-menu {
+    background: #5579eb;
+    padding:4px 10px;
+    font-weight:normal;
+}
+#top-menu li {
+   margin-right: 10px;
+}
+#header {
+    background:#fff;
+    min-height: 7em;
+}
+#header a {
+     color: #5579eb;
+}
+#main-menu {
+    margin-top:15px;
+}
+#main-menu li>a.new-object {
+    background: #fff;
+}
+#main-menu li>a {
+    color: #6b6b6b;
+    display:block;
+    padding: 5px 10px 15px 10px;
+
+}
+#main-menu li>a:hover {
+    border-bottom: 2px solid #333333;
+    color: #333333;
+    background: #fff;
+
+}
+#main-menu li a.selected {
+    color: #5579eb;
+    border-bottom: 2px solid #5579eb;
+
+}
+#main-menu li a.selected:before {
+    color: #5579eb;
+}`);
 var zen_CssSrc = GM_getResourceText("zen_CSS");
 GM_addStyle(zen_CssSrc);
 var select4_CssSrc = GM_getResourceText("select4_CSS");
@@ -1141,3 +1192,4 @@ unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
+
