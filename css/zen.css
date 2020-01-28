@@ -342,6 +342,6 @@ font-size: 1em; width: 15px; padding-left:0px;}
 .icon-checked:before {content:'\e80d';}
 .icon-reload:before {content:'\e800';}
 .icon-save:before {content:'\e80f';}
-a.icon-time.timer {width:70px;}
+a.icon-time-add.timer {width:70px;}
 
 .fancybox-inner .splitcontentleft,.fancybox-inner .splitcontentright {width: 100%;}

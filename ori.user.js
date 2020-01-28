@@ -5,15 +5,17 @@
 // @namespace   obukhow.redmine
 // @downloadURL https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
 // @updateURL   https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
-// @include     http://redmine.oggettoweb.com/issues/*
+// @include     http://redmine.oggettoweb.com/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     2.0.7
+// @version     3.0.0
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=2
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
+// @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -22,21 +24,15 @@
 // @grant       GM_registerMenuCommand
 // @grant       GM_listValues
 // ==/UserScript==
+var zen_CssSrc = GM_getResourceText("zen_CSS");
+GM_addStyle(zen_CssSrc);
 var select4_CssSrc = GM_getResourceText("select4_CSS");
 var bootstrap3_CssSrc = GM_getResourceText("bootstrap3_CSS");
 GM_addStyle(select4_CssSrc);
 GM_addStyle(bootstrap3_CssSrc);
-GM_addStyle("@font-face {" +
-    "font-family: 'Glyphicons Halflings';" +
-    "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.eot');" +
-    "src: url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype')," +
-    "url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.woff') format('woff'), " +
-    "url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.ttf') format('truetype'), " +
-    "url('http://netdna.bootstrapcdn.com/bootstrap/3.3.6/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');" +
-    "}");
-GM_addStyle(".btn-success, .btn-primary, .btn-warning, .btn-danger { color: #fff !important;}");
+GM_addStyle(zen_CssSrc);
+
 GM_addStyle(".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;} .select2-container--open{ z-index:10000;} .fancybox-content .select2-container--below {width: 90% !important;}");
-GM_addStyle("#content h2{line-height:40px;");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle("table.rtfbfq {text-align:right; border:1px solid #fff;} .rtfbfqHeader {font-weight:bold; text-align:center; color: #DDD; min-width: 20px;}");
@@ -121,19 +117,20 @@ var TIME_TYPE = {
     'TEAM_FUCKUP': 'Team Fuc%up'
 };
 
-var isAssignedToMe = ($('#loggedas>a').attr('href') == $('td.assigned-to>a').attr('href'));
+var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
+var isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
 var myUserLink = $('#loggedas a').attr('href');
 var myID = myUserLink.match(/(\d*)$/i)[0];
 var issueID = location.pathname.match(/(\d*)$/i)[0];
-var currentStatus = $('td.status').html();
+var currentStatus = $('div.status>div.value').html();
 var timeKey = issueID + '_startTime';
 var token = $('meta[name="csrf-token"]').attr('content');
 
-var $buttonsContainer = $('a.icon-edit').parent();
+var $buttonsContainer = $('div#content>div.contextual');
 
 var defaultLightBoxOptions = {
-    'content': '#update',
-    'width': '600',
+    'href': '#update',
+    'width': '800',
     'height': '200',
     'type': 'inline'
 };
@@ -229,7 +226,6 @@ function hideFields(force) {
     FIELDS.BA_ESTIMATE.parent().hide();
     FIELDS.SA_ESTIMATE.parent().hide();
     FIELDS.DESIGN_ESTIMATE.parent().hide();
-    FIELDS.PAID.parent().hide();
 }
 
 /**
@@ -263,7 +259,6 @@ function showFields() {
     FIELDS.BA_ESTIMATE.parent().show();
     FIELDS.SA_ESTIMATE.parent().show();
     FIELDS.DESIGN_ESTIMATE.parent().show();
-    FIELDS.PAID.parent().show();
 }
 
 /**
@@ -272,7 +267,7 @@ function showFields() {
  * @return void
  */
 function addHideFormFieldsControl() {
-    $('#update h3').append('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> ' + TEXT.ONLY_WF_FIELDS + '</label>');
+    $('#update h3').after('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> ' + TEXT.ONLY_WF_FIELDS + '</label>');
     $checkbox = $('#conf-hide_fieds');
     $checkbox.prop('checked', canHideFields());
     $checkbox.change(function () {
@@ -330,19 +325,15 @@ function getDefaultActivity() {
 /**
  *  Add button function
  */
-function addButton(text, action, className, icon) {
-    if (typeof(icon) === "undefinded") {
-        var iconHtml = '';
-    } else {
-        var iconHtml = '<span class="glyphicon ' + icon + '"></span> ';
-    }
+function addButton(text, action, className) {
+
     if (typeof(className) === "undefinded") {
         className = 'btn-default';
     }
     if ($('.manage-issue-buttons').length == 0) {
-        $('<div class="contextual manage-issue-buttons btn-group"></div>').insertAfter($buttonsContainer);
+        $('<div class="contextual manage-issue-buttons"></div>').insertAfter($buttonsContainer);
     }
-    $('.manage-issue-buttons').append('<a class="btn ' + className + '" onclick="' + action + '; return false;" href="#">' + iconHtml + '' + text + '</a>');
+    $('.manage-issue-buttons').append('<a class="icon ' + className + '" onclick="' + action + '; return false;" href="#">' + text + '</a>');
 }
 
 /**
@@ -453,7 +444,7 @@ function getStartProgressFunction() {
 /**
  * Show config popup
  */
-showConfigLightBoxOnComplete = function () {
+var showConfigLightBoxOnComplete = function () {
     setTimeout(function () {
         $('#user_role').val(getMyRole());
         $('#reviewer').prop('checked', isReviewer());
@@ -474,14 +465,14 @@ var showConfigLightBoxOnClosed = function () {
 };
 exportFunction(showConfigLightBoxOnClosed, unsafeWindow, {defineAs: "showConfigLightBoxOnClosed"});
 var showConfigLightBox = {
-    'content': '#config_form_block',
+    'href': '#config_form_block',
     'width': '600',
     'height': '200',
     'type': 'inline'
 };
 unsafeWindow.showConfigLightBox = cloneInto(showConfigLightBox, unsafeWindow);
-unsafeWindow.showConfigLightBox.onComplete = unsafeWindow.showConfigLightBoxOnComplete;
-unsafeWindow.showConfigLightBox.onClosed = unsafeWindow.showConfigLightBoxOnClosed;
+unsafeWindow.showConfigLightBox.afterShow = unsafeWindow.showConfigLightBoxOnComplete;
+unsafeWindow.showConfigLightBox.afterClose = unsafeWindow.showConfigLightBoxOnClosed;
 function showConfig() {
 
     setTimeout(function () { // to allow inserted content be handled by browser
@@ -494,6 +485,34 @@ function showConfig() {
     }, 500);
 }
 exportFunction(showConfig, unsafeWindow, {defineAs: "showConfig"});
+
+var showVersionLightBox = {
+    'href': '#versionPopup',
+    'width': '600',
+    'height': '200',
+    'type': 'inline'
+};
+unsafeWindow.showVersionLightBox = cloneInto(showVersionLightBox, unsafeWindow);
+
+function showVersion() {
+      setTimeout(function () { // to allow inserted content be handled by browser
+        if (unsafeWindow.jQuery('#versionPopup').length < 1) {
+            unsafeWindow.jQuery('body').append(GM_getResourceText("version_HTML"));
+        } else {
+            unsafeWindow.jQuery('#versionPopup').show();
+        }
+        unsafeWindow.jQuery.fancybox(unsafeWindow.showVersionLightBox);
+    }, 500);
+}
+
+function saveVersion() {
+    GM_setValue('version_4', 1);
+    unsafeWindow.jQuery.fancybox.close();
+}
+exportFunction(saveVersion, unsafeWindow, {defineAs: "saveVersion"});
+exportFunction(showVersion, unsafeWindow, {defineAs: "showVersion"});
+
+
 
 
 /**
@@ -611,7 +630,7 @@ function showTimer() {
     }
     var pausedTime = getTimeDiff();
 
-    addButton('<span id="timer-btn" class="timer-btn"></span>', 'logTimerTime()', 'btn-warning', 'glyphicon-time');
+    addButton('<span id="timer-btn" class="timer-btn"></span>', 'logTimerTime()', 'icon-time-add timer');
     $('.timer-btn').stopwatch({
         startTime: pausedTime
     }).stopwatch('start');
@@ -784,6 +803,7 @@ unsafeWindow._showReviewResultPopupLightBox.onClosed = unsafeWindow._showReviewR
 function _showReviewResultPopup(status) {
     FIELDS.SPENT_TIME.val(getTimerTime());
     FIELDS.PRIVATE_NOTES.prop('checked', true);
+    FIELDS.STATUS.val(status);
     formPrepareToShowInPopup();
     unsafeWindow.jQuery.fancybox(unsafeWindow._showReviewResultPopupLightBox);
 
@@ -847,7 +867,7 @@ function logTimerTime() {
         return unsafeWindow._showLogTimePopup();
     } else {
         $.ajax({
-            url: location.href + '/time_entries/new',
+            url: location.origin + location.pathname + '/time_entries/new',
             dataType: 'text'
         }).done(function (data) {
             $('body').append('<div id="log_time_container"></div>');
@@ -898,7 +918,7 @@ var _showLogTimePopupOnClosed = function () {
 };
 exportFunction(_showLogTimePopupOnClosed, unsafeWindow, {defineAs: "_showLogTimePopupOnClosed"});
 var _showLogTimePopupLightBox = {
-    'content': '#log_time_container',
+    'href': '#log_time_container',
     'width': '600',
     'height': '250'
 };
@@ -932,9 +952,8 @@ function showTotalRegularTime() {
  * Show issue total regular time
  */
 function showMyTime() {
-    $('<tr><th></th><td></td>' +
-        '<th class="spent-by-me">' + TEXT.SPENT_BY_ME +
-        ':</th><td class="spent-by-me">' + TEXT.LOADING + '</td></tr>').insertAfter($('th.spent-time').parent());
+    $('<div class="spent-by-me attribute"><div class="label">' + TEXT.SPENT_BY_ME +
+        ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
     var totalHours = 0, regularHours = 0, fuckupHours = 0;
     var tUrl = getTimeTrackerUrl(false, false, true);
     var rUrl = getTimeTrackerUrl(TIME_TYPE.REGULAR, false, true);
@@ -943,7 +962,7 @@ function showMyTime() {
         totalHours = _parseRedmineHours(tData[0]);
         regularHours = _parseRedmineHours(rData[0]);
         fuckupHours = _parseRedmineHours(fData[0]);
-        $('td.spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
+        $('div.value-spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
             + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
     });
     addRtfBfqTime();
@@ -954,7 +973,8 @@ function showMyTime() {
  */
 function addRtfBfqTime() {
 
-    $('td.spent-time').prepend('<span id="rtfbfq" class="glyphicon glyphicon-th" aria-hidden="true" data-html="true" data-trigger="click" data-toggle="popover" data-content="' + TEXT.LOADING + '"></span>');
+    if ($('div.spent-time>div.value').length > 0) {
+    $('div.spent-time>div.value').prepend('<span id="rtfbfq" class="icon icon-time-add" aria-hidden="true" data-html="true" data-trigger="click" data-toggle="popover" data-content="' + TEXT.LOADING + '"></span>');
 
     $(function () {
         $('[data-toggle="popover"]').popover();
@@ -964,6 +984,7 @@ function addRtfBfqTime() {
         dataType: 'jsonp',
         jsonpCallback: 'insertRtfBfqTable'
     });
+    }
 }
 
 /**
@@ -1004,18 +1025,19 @@ function insertRtfBfqTable(data) {
  * @return sting
  */
 function getTimeTrackerUrl(tracker, activity, filterByMe) {
-    var baseUrl = location.origin + '/issues/' + issueID + '/time_entries?utf8=✓&f[]=spent_on' +
-        '&op[spent_on]=*';
+    var baseUrl = location.origin + '/time_entries';
+    var uri = '?utf8=✓&set_filter=1&sort=spent_on:desc&f[]=spent_on&op[spent_on]=*&f[]=issue_id&op[issue_id]=~&v[issue_id][]=' + issueID;
     if (typeof(filterByMe) !== 'undefined' && filterByMe) {
-        baseUrl += '&f[]=user_id&op[user_id]=%3D&v[user_id][]=me';
+        uri += '&f[]=user_id&op[user_id]==&v[user_id][]=me';
     }
     if (typeof(tracker) !== 'undefined' && tracker) {
-        baseUrl += '&f[]=cf_12&op[cf_12]=%3D&v[cf_12][]=' + tracker.replace('%', '%25');
+        uri += '&f[]=cf_12&op[cf_12]==&v[cf_12][]=' + tracker.replace('%', '%25');
     }
     if (typeof(activity) !== 'undefined' && activity) {
-        baseUrl += '&f[]=activity_id&op[activity_id]=%3D&f[]=&c[]=project&c[]=spent_on&c[]=user&c[]=activity&c[]=issue&c[]=comments&c[]=hours&v[activity_id][]=' + activity;
+        uri += '&f[]=activity_id&op[activity_id]==&v[activity_id][]=' + activity;
     }
-    return baseUrl;
+    uri += '&f[]=&c[]=project&c[]=spent_on&c[]=user&c[]=activity&c[]=issue&c[]=comments&c[]=hours&group_by=&t[]=hours&t[]=';
+    return baseUrl + uri;
 }
 
 /**
@@ -1025,64 +1047,68 @@ function getTimeTrackerUrl(tracker, activity, filterByMe) {
  * @private
  */
 function _parseRedmineHours(data) {
-    var content = $($.parseHTML(data)).filter('.total-hours').html();
-    var result = content.match(/<span class="hours hours-int">(\d*)<\/span><span class="hours hours-dec">(\.\d*)<\/span>/i);
-    return result[1] + result[2];
+    var content = $($.parseHTML(data)).filter('.query-totals').text();
+    var result = content.match(/Hours\:\s([\.\d]{1,})/i);
+    if (result) {
+        return result[1];
+    }
+    return 0;
 }
 
-initFormElements();
 
 
-//change link styles
 
-$buttonsContainer.addClass('btn-group');
-$buttonsContainer.children().addClass('btn btn-default');
-
-$('a.icon-edit').prepend('<span class="glyphicon glyphicon-pencil"></span> ').append('…');
-$('a.icon-time-add').prepend('<span class="glyphicon glyphicon-time"></span> ');
-$('a.icon-fav-off').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
-$('#issue-form input[type=submit]').addClass('btn btn-success form-submit-btn');
-$('#issue-form input[type=submit]').next().addClass('btn btn-primary form-preview-btn').prepend('<span class="glyphicon glyphicon-eye-open"></span> ');
-
+if (isIssuePage) {
 //add buttons
 
 if (isAssignedToMe) {
     if (canStartProgress()) {
-        var text = getStartProgressText();
-        addButton(text, getStartProgressFunction() + '()', 'btn-success', 'glyphicon-play-circle');
+        addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play');
     } else if (currentStatus == STATUS.IN_PROGRESS.TEXT) {
         if (isOnReview()) {
-            addButton(TEXT.REVIEW_PASSED, 'reviewPassed()', 'btn-success', 'glyphicon-thumbs-up');
+            addButton(TEXT.REVIEW_PASSED, 'reviewPassed()', 'icon-good');
             showTimer();
-            addButton(TEXT.REVIEW_FAILED, 'reviewFailed()', 'btn-danger', 'glyphicon-thumbs-down');
+            addButton(TEXT.REVIEW_FAILED, 'reviewFailed()', 'icon-bad');
         } else if (isOnTesting()) {
-            addButton(TEXT.TEST_PASSED, 'testPassed()', 'btn-success', 'glyphicon-thumbs-up');
+            addButton(TEXT.TEST_PASSED, 'testPassed()', 'icon-good');
             showTimer();
-            addButton(TEXT.TEST_FAILED, 'testFailed()', 'btn-danger', 'glyphicon-thumbs-down');
+            addButton(TEXT.TEST_FAILED, 'testFailed()', 'icon-bad');
         } else {
-            addButton(TEXT.RESOLVE_ISSUE, 'resolveIssue()', 'btn-success', 'glyphicon-ok');
+            addButton(TEXT.RESOLVE_ISSUE, 'resolveIssue()', 'icon-ok');
             showTimer();
-            addButton(TEXT.FROZE_ISSUE, 'frozeProgress()', 'btn-primary', 'glyphicon-pause');
+            addButton(TEXT.FROZE_ISSUE, 'frozeProgress()', 'icon-froze');
         }
     } else if (canStartTest()) {
-        var text = getStartProgressText();
-        addButton(text, getStartProgressFunction() + '()', 'btn-success', 'glyphicon-play-circle');
+        addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play', 'glyphicon-play-circle');
     } else if (canClose()) {
-        addButton(TEXT.CLOSE_ISSUE, 'closeIssue()', 'btn-danger', 'glyphicon-remove');
+        addButton(TEXT.CLOSE_ISSUE, 'closeIssue()', 'icon-lock');
     } else if (canDoReview()) {
-        addButton(TEXT.START_REVIEW, 'startReview()', 'btn-success', 'glyphicon-play-circle');
+        addButton(TEXT.START_REVIEW, 'startReview()', 'icon-play');
     }
 } else {
-    addButton(TEXT.ASSIGN_TO_ME, 'assignToMe()', 'btn-primary', 'glyphicon-user');
+    addButton(TEXT.ASSIGN_TO_ME, 'assignToMe()', 'icon-user');
 }
 
-addMoreButton();
-showTotalRegularTime();
-showMyTime();
-addHideFormFieldsControl();
+}
+
+if (isIssuePage) {
+    addMoreButton();
+    showTotalRegularTime();
+    showMyTime();
+    addHideFormFieldsControl();
+    initFormElements();
+    //change link styles
+
+    $('a.icon-edit').append('…');
+
+}
 
 if (!GM_getValue('user_role')) {
     unsafeWindow.showConfig();
+}
+
+if (!GM_getValue('version_4')) {
+    unsafeWindow.showVersion();
 }
 
 GM_registerMenuCommand("Preferences…", unsafeWindow.showConfig, "C");
@@ -1109,8 +1135,11 @@ exportFunction(_showLogTimePopup, unsafeWindow, {defineAs: "_showLogTimePopup"})
 exportFunction(formPrepareToShowInPopup, unsafeWindow, {defineAs: "formPrepareToShowInPopup"});
 exportFunction(formReturnToPreviousStateAfterPopupClose, unsafeWindow, {defineAs: "formReturnToPreviousStateAfterPopupClose"});
 exportFunction(insertRtfBfqTable, unsafeWindow, {defineAs: "insertRtfBfqTable"});
+exportFunction(showVersion, unsafeWindow, {defineAs: "showVersion"});
+
 
 unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
+
