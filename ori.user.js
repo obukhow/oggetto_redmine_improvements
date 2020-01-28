@@ -10,10 +10,10 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.0
+// @version     3.0.1
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=2
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=3
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -803,7 +803,6 @@ unsafeWindow._showReviewResultPopupLightBox.onClosed = unsafeWindow._showReviewR
 function _showReviewResultPopup(status) {
     FIELDS.SPENT_TIME.val(getTimerTime());
     FIELDS.PRIVATE_NOTES.prop('checked', true);
-    FIELDS.STATUS.val(status);
     formPrepareToShowInPopup();
     unsafeWindow.jQuery.fancybox(unsafeWindow._showReviewResultPopupLightBox);
 
@@ -944,7 +943,7 @@ function closeIssue() {
 function showTotalRegularTime() {
     var url = getTimeTrackerUrl(TIME_TYPE.REGULAR);
     $.get(url).done(function (data) {
-        $("td.spent-time").append(' (R: <a href="' + url + '">' + _parseRedmineHours(data) + '</a>)');
+        $("div.spent-time>div.value").append(' (R: <a href="' + url + '">' + _parseRedmineHours(data) + '</a>)');
     });
 }
 
@@ -1142,4 +1141,3 @@ unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
-
