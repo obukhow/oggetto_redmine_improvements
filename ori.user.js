@@ -10,10 +10,10 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.3
+// @version     3.0.4
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=4
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=5
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -91,7 +91,16 @@ var EN_TEXT = {
     ONLY_WF_FIELDS: 'Only workflow fields',
 };
 
-var TEXT = ($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
+var isAssignedToMe = false;
+var myUserLink = '';
+var myID = '';
+var issueID = location.pathname.match(/(\d*)$/i)[0];
+var currentStatus = '';
+var timeKey = issueID + '_startTime';
+var token = '';
+
+var $buttonsContainer = '';
+var TEXT = EN_TEXT;($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
 
 var FIELDS;
 
@@ -118,15 +127,7 @@ var TIME_TYPE = {
 };
 
 var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
-var isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
-var myUserLink = $('#loggedas a').attr('href');
-var myID = myUserLink.match(/(\d*)$/i)[0];
-var issueID = location.pathname.match(/(\d*)$/i)[0];
-var currentStatus = $('div.status>div.value').html();
-var timeKey = issueID + '_startTime';
-var token = $('meta[name="csrf-token"]').attr('content');
-
-var $buttonsContainer = $('div#content>div.contextual');
+var isAssignedToMe = false;
 
 var defaultLightBoxOptions = {
     'href': '#update',
@@ -1059,6 +1060,15 @@ function _parseRedmineHours(data) {
 
 if (isIssuePage) {
 //add buttons
+$(function() {
+    isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
+    myUserLink = $('#loggedas a').attr('href');
+    myID = myUserLink.match(/(\d*)$/i)[0];
+    currentStatus = $('div.status>div.value').html();
+    token = $('meta[name="csrf-token"]').attr('content');
+    $buttonsContainer = $('div#content>div.contextual');
+    TEXT = ($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
+
 
 if (isAssignedToMe) {
     if (canStartProgress()) {
@@ -1088,9 +1098,6 @@ if (isAssignedToMe) {
     addButton(TEXT.ASSIGN_TO_ME, 'assignToMe()', 'icon-user');
 }
 
-}
-
-if (isIssuePage) {
     addMoreButton();
     showTotalRegularTime();
     showMyTime();
@@ -1099,6 +1106,7 @@ if (isIssuePage) {
     //change link styles
 
     $('a.icon-edit').append('…');
+});
 
 }
 
@@ -1141,4 +1149,3 @@ unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
-
