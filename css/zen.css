@@ -131,7 +131,7 @@ h2, .wiki h1 {
 #main-menu li a.selected {
     color: #fff;
     border-bottom: 2px solid #5b7dff;
-    background: #2d3646;  
+    background-color: #2d3646;  
 }
 #main-menu li a.selected:hover {
     background:#222;
@@ -192,6 +192,10 @@ h2, .wiki h1 {
     content: '\f114';
     font-size: 16px;
 }
+#main-menu .menu-children li a:hover {
+    background-color: #2d3646;
+    border: none;
+}
 #main {
     border-top: 2px solid #f6f6f6;
 }
@@ -201,6 +205,19 @@ h2, .wiki h1 {
 #content {
     border: none;
 }
+.context-menu-selection,.context-menu-selection:hover {
+    background-color: #2d3646 !important;
+}
+#context-menu, #context-menu ul li ul {background-color: #fff; border: none; border-radius: 3px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.5);}
+#context-menu ul {
+    padding: 2px 0;
+    border: none;
+}
+#context-menu li {padding: 5px 2px; border:none;}
+#context-menu li:hover {border:none;border-left:1px solid #6d7a91;border-right:1px solid #6d7a91; color:#fff; border-radius:0; background: #2d3646; padding:5px 1px;}
+#context-menu li:hover>a {color: #fff;}
+
+
 div.issue {
     border:none;
     background: #fff;
@@ -231,15 +248,7 @@ div.attributes {
 #sidebar a, #sidebar a:link, #sidebar a:visited {color: #6b6b6b;}
 #sidebar a.selected { background-color: #c8d5ff;}
 #sidebar div.contextual>a {color: #5b7dff;}
-div.contextual>a.icon {
-    display: block;
-    border-radius: 3px;
-    background-color: #428cb9;
-    color: #fff;
-    float:left;
-    padding: 10px 10px 10px 25px;
-    background-position: 10% 50%;
-}
+
 .journal {
     background: #fff;
     border: 1px solid #e3e3e3;
@@ -325,14 +334,29 @@ table.list tr.issue.priority-5 td.priority:before, .priority-5 .priority .value:
 table.list tr.issue.priority-6 td.priority:before { content: 'Urgent'; display:block; background-color:#fee4ed; color:#f0437b;} 
 table.list tr.issue.priority-7 td.priority:before { content: 'Immediate'; display:block; background-color:#f4ecff; color:#ba7df4;}
 .autoscroll {margin-bottom: 0px;}
+table.list:not(.odd-even) tbody tr:nth-child(2n+1):hover, .odd:hover, #issue-changesets div.changeset:nth-child(2n+1):hover, table.list:not(.odd-even) tbody tr:nth-child(2n):hover, .even:hover, #issue-changesets div.changeset:nth-child(2n):hover{background-color: #cdd2db;}
+div.issue table.list tr.issue td {padding: 5px 10px 5px 0;}
 span.pagination {background-color: #fff; margin:0; padding: 15px; margin-top: -5px;}
 .pagination ul.pages li {border-radius: 3px; margin-right: 5px; padding:5px; background-color: #f7f7f7;display: inline-block;border:none;}
 .pagination ul.pages li a {color: #bbb;}
 .pagination ul.pages li.current {background-color: #bbb;}
 .box,.mypage-box,#projects-index ul.projects li.root {background-color: #fff; border: none; padding: 15px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.05)}
 
+div.contextual>a.icon, input[type=submit], button {
+    display: inline-block;
+    border-radius: 3px;
+    background-color: #428cb9;
+    color: #fff;
+    padding: 10px 10px 10px 25px;
+    background-position: 10% 50%;
+    border: none;
+}
+input[type=submit], button {
+    padding: 10px;
+    font-size: 14px;
+}
 div.contextual > a.icon {padding-left: 10px;}
-div.contextual > a.icon:hover {
+div.contextual > a.icon:hover, input[type=submit]:hover, button:hover {
     opacity: .8;
     text-decoration: none;
 }
@@ -358,6 +382,8 @@ a.icon-time-add.timer {width:70px;}
 
 .fancybox-inner .splitcontentleft,.fancybox-inner .splitcontentright {width: 100%;}
 a.js-contextmenu {font-size: 0;}
+
+#rtfbfq {padding-left: 0px; cursor:pointer;}
 
 #content .jstTabs.tabs, .jstTabs.tabs {
     overflow: visible;
@@ -486,3 +512,14 @@ fieldset div.attributes {
     border: none;
     padding: 20px 0;
 }
+fieldset#filters td.values input { height:auto;}
+.select2-container .select2-selection--single .select2-selection__rendered {padding-left: 15px; font-size:.875rem; font-weight:400; color:#495057; }
+.select2-container--default .select2-selection--single {background-color:#fff;
+ background-clip:padding-box;
+ border:1px solid #ced4da;
+ border-radius:.2rem;
+ -webkit-transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+ transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out
+              box-sizing:border-box;
+    box-sizing:border-box;}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {background-color:#2d3646;}
