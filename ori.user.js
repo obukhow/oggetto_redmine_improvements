@@ -270,7 +270,7 @@ function showFields() {
  */
 function addHideFormFieldsControl() {
     $('#update h3').after('<label style="line-height: 16px; font-size:12px;" for="conf-hide_fieds"><input style="margin: 0px 4px 4px 20px;" id="conf-hide_fieds" value="1" type="checkbox"> ' + TEXT.ONLY_WF_FIELDS + '</label>');
-    $checkbox = $('#conf-hide_fieds');
+    var $checkbox = $('#conf-hide_fieds');
     $checkbox.prop('checked', canHideFields());
     $checkbox.change(function () {
         GM_setValue('conf_hide_fields', $(this).prop('checked'));
@@ -756,10 +756,28 @@ function formReturnToPreviousStateAfterPopupClose() {
 var resolveIssueOnComplete = function () {
     setTimeout(function () {
         FIELDS.STATUS.val(STATUS.RESOLVED.VALUE);
-        $('.jstEditor>.jstElements').hide();
         $('#issue-form').on('submit.resolve', function () {
             stopTimer();
         });
+        $('#update').on('click', 'div.jstTabs a.tab-preview', function(event){
+    var tab = $(event.target);
+
+    var url = tab.data('url');
+    var form = tab.parents('form');
+    var jstBlock = tab.parents('.jstBlock');
+
+    var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
+    var attachments = form.find('.attachments_fields input').serialize();
+
+    $.ajax({
+      url: url,
+      type: 'post',
+      data: "text=" + element + '&' + attachments,
+      success: function(data){
+        jstBlock.find('.wiki-preview').html(data);
+      }
+    });
+  });
     }, 0);
 };
 exportFunction(resolveIssueOnComplete, unsafeWindow, {defineAs: "resolveIssueOnComplete"});
@@ -789,6 +807,25 @@ var _showReviewResultPopupOnComplete = function () {
         $('#issue-form').on('submit.reviewResult', function () {
             localStorage.removeItem(issueID + '_review');
         });
+        $('#update').on('click', 'div.jstTabs a.tab-preview', function(event){
+    var tab = $(event.target);
+
+    var url = tab.data('url');
+    var form = tab.parents('form');
+    var jstBlock = tab.parents('.jstBlock');
+
+    var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
+    var attachments = form.find('.attachments_fields input').serialize();
+
+    $.ajax({
+      url: url,
+      type: 'post',
+      data: "text=" + element + '&' + attachments,
+      success: function(data){
+        jstBlock.find('.wiki-preview').html(data);
+      }
+    });
+  });
     }, 0);
 };
 exportFunction(_showReviewResultPopupOnComplete, unsafeWindow, {defineAs: "_showReviewResultPopupOnComplete"});
@@ -1150,3 +1187,4 @@ unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
+

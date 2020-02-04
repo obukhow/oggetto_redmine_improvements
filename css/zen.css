@@ -394,10 +394,18 @@ a.js-contextmenu {font-size: 0;}
 
 #content .jstTabs.tabs, .jstTabs.tabs {
     overflow: visible;
-    margin-bottom: -5px;
 }
 .jstEditor textarea {
     padding: 15px;
+}
+.jstTabs ul {
+    margin: 0;
+    margin-left: 0.5em;
+    padding:0;
+}
+.jstTabs ul li {
+    display: inline-block;
+    list-style-type: none;
 }
 #content .jstTabs.tabs li a, .jstTabs.tabs li a {
     display: inline-block;
