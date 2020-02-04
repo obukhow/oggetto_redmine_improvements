@@ -280,6 +280,13 @@ div.attributes {
             -ms-transform-origin:center;
             transform-origin:center
 }
+#history div:target:before {
+    background-color: #DDEEFF;
+}
+div.journal.private-notes>div:before {
+    border-bottom-color:#d22;
+    border-left-color:#d22;
+}
 div.journal .contextual {
     margin: 10px;
 }
@@ -326,8 +333,8 @@ table.list tr.issue.tracker-2 td.id a { display:block; border: 1px solid #5fc27e
 table.list tr.issue.tracker-3 td.id a,table.list tr.issue.tracker-4 td.id a { display:block; border: 1px solid  #5b7dff; color:  #5b7dff; border-radius: 3px; padding: 3px;}
 table.list tr.issue.tracker-5 td.id a { display:block; border: 1px solid #333; color: #333; border-radius: 3px; padding: 3px;} 
 
-table.list tr.issue td.priority, .priority .value { content: ''; font-size:0; padding-right: 10px;}
-table.list tr.issue td.priority:before, , .priority .value:before {display:block; font-size:12px; text-transform:uppercase; border-radius:3px; padding: 5px; width: 70px; text-align: center;}
+table.list tr.issue td.priority, .priority .value { content: ''; font-size:0; padding-right: 10px; line-height: 1.5em;}
+table.list tr.issue td.priority:before, .priority .value:before {display:inline-block; font-size:12px; text-transform:uppercase; border-radius:3px; padding: 5px; width: 70px; text-align: center; line-height: 1.5em;}
 table.list tr.issue.priority-3 td.priority:before { content: 'Low'; display:block; background-color:#d3f4e9; color:#2a8;}
 table.list tr.issue.priority-4 td.priority:before { content: 'Normal'; display:block; background-color:#f4f4f4; color:#9f9f9f;}
 table.list tr.issue.priority-5 td.priority:before, .priority-5 .priority .value:before { content: 'High'; display:block; background-color:#fff1e2; color:#f1a454;} 
@@ -444,7 +451,7 @@ select, input[type=text],input[type=date], textarea {
               box-sizing:border-box;
     box-sizing:border-box;
 }
-textarea {
+textarea, select[multiple] {
     height: auto;
 }
 input.string_cf {
