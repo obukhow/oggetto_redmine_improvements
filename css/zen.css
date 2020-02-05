@@ -335,11 +335,12 @@ table.list tr.issue.tracker-5 td.id a { display:block; border: 1px solid #333; c
 
 table.list tr.issue td.priority, .priority .value { content: ''; font-size:0; padding-right: 10px; line-height: 1.5em;}
 table.list tr.issue td.priority:before, .priority .value:before {display:inline-block; font-size:12px; text-transform:uppercase; border-radius:3px; padding: 5px; width: 70px; text-align: center; line-height: 1.5em;}
-table.list tr.issue.priority-3 td.priority:before { content: 'Low'; display:block; background-color:#d3f4e9; color:#2a8;}
-table.list tr.issue.priority-4 td.priority:before { content: 'Normal'; display:block; background-color:#f4f4f4; color:#9f9f9f;}
-table.list tr.issue.priority-5 td.priority:before, .priority-5 .priority .value:before { content: 'High'; display:block; background-color:#fff1e2; color:#f1a454;} 
-table.list tr.issue.priority-6 td.priority:before { content: 'Urgent'; display:block; background-color:#fee4ed; color:#f0437b;} 
-table.list tr.issue.priority-7 td.priority:before { content: 'Immediate'; display:block; background-color:#f4ecff; color:#ba7df4;}
+.priority .value:before {line-height: 1em; }
+table.list tr.issue.priority-3 td.priority:before, .issue.priority-3 .priority .value:before { content: 'Low'; display:block; background-color:#d3f4e9; color:#2a8;}
+table.list tr.issue.priority-4 td.priority:before, .issue.priority-4 .priority .value:before { content: 'Normal'; display:block; background-color:#f4f4f4; color:#9f9f9f;}
+table.list tr.issue.priority-5 td.priority:before, .issue.priority-5 .priority .value:before { content: 'High'; display:block; background-color:#fff1e2; color:#f1a454;} 
+table.list tr.issue.priority-6 td.priority:before, .issue.priority-6 .priority .value:before { content: 'Urgent'; display:block; background-color:#fee4ed; color:#f0437b;} 
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-7 .priority .value:before { content: 'Immediate'; display:block; background-color:#f4ecff; color:#ba7df4;}
 .autoscroll {margin-bottom: 0px;}
 table.list:not(.odd-even) tbody tr:nth-child(2n+1):hover, .odd:hover, #issue-changesets div.changeset:nth-child(2n+1):hover, table.list:not(.odd-even) tbody tr:nth-child(2n):hover, .even:hover, #issue-changesets div.changeset:nth-child(2n):hover{background-color: #cdd2db;}
 div.issue table.list tr.issue td {padding: 5px 10px 5px 0;}
@@ -459,6 +460,7 @@ select, input[type=text],input[type=date], textarea {
               box-sizing:border-box;
     box-sizing:border-box;
 }
+input[type=radio],input[type=checkbox] { margin-top: 0;}
 textarea, select[multiple] {
     height: auto;
 }
@@ -480,7 +482,13 @@ input.string_cf {
  transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out
 }
 
-
+select {
+ background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .7rem center/8px 10px;
+    padding-right: 17px;
+ -webkit-appearance:none;
+ -moz-appearance:none;
+ appearance:none
+}
 select::-ms-expand, input::-ms-expand, textarea::-ms-expand {
  background-color:transparent;
  border:0
@@ -529,12 +537,15 @@ fieldset div.attributes {
 }
 fieldset#filters td.values input { height:auto;}
 .select2-container .select2-selection--single .select2-selection__rendered {padding-left: 15px; font-size:.875rem; font-weight:400; color:#495057; }
-.select2-container--default .select2-selection--single {background-color:#fff;
+.select2-container--default .select2-selection--single {
+    background-color:#fff;
  background-clip:padding-box;
  border:1px solid #ced4da;
  border-radius:.2rem;
  -webkit-transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;
  transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out
               box-sizing:border-box;
-    box-sizing:border-box;}
+    box-sizing:border-box; background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .7rem center/8px 10px;
+}
 .select2-container--default .select2-results__option--highlighted[aria-selected] {background-color:#2d3646;}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {border:none;}

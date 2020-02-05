@@ -1,0 +1,45 @@
+<div id="configFormContainer">
+    <div id="config_form_block">
+        <h3>Configuration</h3>
+        <form id="config_form">
+            <div class="box">
+                <fieldset class="tabular">
+                    <p><label for="user_role">Treat me like a</label>
+                        <select id="user_role">
+                            <option value="back_dev" data-activity="12">Backend Developer</option>
+                            <option value="front_dev" data-activity="13">Frontend Developer</option>
+                            <option value="qa" data-activity="11">QA</option>
+                            <option value="pm" data-activity="16">PM</option>
+                            <option value="designer" data-activity="8">Designer</option>
+                            <option value="admin" data-activity="35">System Administrator/Superhero</option>
+                        </select>
+                    </p>
+                    <p class="reviewer"><label for="reviewer">I'm also a reviewer</label><input id="reviewer" value="1" type="checkbox"></p>
+                    <p><label for="activity">Default value for Activity</label>
+                        <select id="activity">
+                            <option value="8">Design</option>
+                            <option value="11">Testing</option>
+                            <option value="12" selected="selected">Backend development</option>
+                            <option value="13">Frontend development</option>
+                            <option value="16">Project management</option>
+                            <option value="35">System Administration</option>
+                        </select>
+                    </p>
+                </fieldset>
+                <input class="btn btn-success" type="submit" value="Apply"/>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+        $('#user_role').change(function(){
+            var value = $(this).val();
+            if (value == "back_dev" || value == "front_dev") {
+                $('.reviewer').show();
+            } else {
+                $('#reviewer').prop('checked', false);
+                $('.reviewer').hide();
+            }
+            $('#activity').val($("#user_role option:selected").data('activity'));
+        });
+    </script>
+</div>

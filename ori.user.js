@@ -11,11 +11,11 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.5
+// @version     3.0.6
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
-// @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_1.3.html
+// @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
 // @grant       GM_getValue
@@ -99,6 +99,7 @@ var issueID = location.pathname.match(/(\d*)$/i)[0];
 var currentStatus = '';
 var timeKey = issueID + '_startTime';
 var token = '';
+var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
 
 var $buttonsContainer = '';
 var TEXT = EN_TEXT;($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
@@ -110,7 +111,8 @@ var ROLES = {
     'FRONTEND_DEVELOPER': 'front_dev',
     'QA': 'qa',
     'PM': 'pm',
-    'DESIGNER': 'designer'
+    'DESIGNER': 'designer',
+    'ADMIN': 'admin'
 };
 
 var ACTIVITIES = {
@@ -118,7 +120,8 @@ var ACTIVITIES = {
     'FRONTEND_DEVELOPMENT': 13,
     'TESTING': 11,
     'PROJECT_MANAGEMENT': 16,
-    'DESIGN': 8
+    'DESIGN': 8,
+    'ADMIN': 35
 };
 
 var TIME_TYPE = {
@@ -127,8 +130,6 @@ var TIME_TYPE = {
     'TEAM_FUCKUP': 'Team Fuc%up'
 };
 
-var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
-var isAssignedToMe = false;
 
 var defaultLightBoxOptions = {
     'href': '#update',
@@ -179,6 +180,7 @@ function initFormElements() {
         'PRIVATE_FLAG': $('#issue_is_private'),
         'PAID': $('#time_entry_custom_field_values_32')
     };
+    document.getElementById('issue_status_id').onchange = undefined;
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
     );
@@ -707,23 +709,6 @@ function startTesting() {
     unsafeWindow.startProgress();
 }
 
-/**
- * Rewritten function from redmine core
- *
- * @param url
- */
-unsafeWindow.updateIssueFrom = function (url) {
-    unsafeWindow.jQuery.ajax({
-        url: url,
-        type: 'post',
-        data: $('#issue-form').serialize()
-    }).done(function () {
-        setTimeout(function () {
-            initFormElements();
-        }, 200);
-    });
-}
-
 function formPrepareToShowInPopup() {
     setTimeout(function () {
         hideFields(true);
@@ -769,7 +754,7 @@ var resolveIssueOnComplete = function () {
     var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
     var attachments = form.find('.attachments_fields input').serialize();
 
-    $.ajax({
+    unsafeWindow.jQuery.ajax({
       url: url,
       type: 'post',
       data: "text=" + element + '&' + attachments,
@@ -802,8 +787,6 @@ function resolveIssue() {
  * @private
  */
 var _showReviewResultPopupOnComplete = function () {
-    setTimeout(function () {
-        FIELDS.STATUS.val(status);
         $('#issue-form').on('submit.reviewResult', function () {
             localStorage.removeItem(issueID + '_review');
         });
@@ -817,7 +800,7 @@ var _showReviewResultPopupOnComplete = function () {
     var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
     var attachments = form.find('.attachments_fields input').serialize();
 
-    $.ajax({
+    unsafeWindow.jQuery.ajax({
       url: url,
       type: 'post',
       data: "text=" + element + '&' + attachments,
@@ -826,7 +809,6 @@ var _showReviewResultPopupOnComplete = function () {
       }
     });
   });
-    }, 0);
 };
 exportFunction(_showReviewResultPopupOnComplete, unsafeWindow, {defineAs: "_showReviewResultPopupOnComplete"});
 var _showReviewResultPopupOnClosed = function () {
@@ -837,12 +819,13 @@ var _showReviewResultPopupOnClosed = function () {
 exportFunction(_showReviewResultPopupOnClosed, unsafeWindow, {defineAs: "_showReviewResultPopupOnClosed"});
 var _showReviewResultPopupLightBox = defaultLightBoxOptions;
 unsafeWindow._showReviewResultPopupLightBox = cloneInto(_showReviewResultPopupLightBox, unsafeWindow);
-unsafeWindow._showReviewResultPopupLightBox.onComplete = unsafeWindow._showReviewResultPopupOnComplete;
-unsafeWindow._showReviewResultPopupLightBox.onClosed = unsafeWindow._showReviewResultPopupOnClosed;
+unsafeWindow._showReviewResultPopupLightBox.afterShow = unsafeWindow._showReviewResultPopupOnComplete;
+unsafeWindow._showReviewResultPopupLightBox.afterClose = unsafeWindow._showReviewResultPopupOnClosed;
 function _showReviewResultPopup(status) {
     FIELDS.SPENT_TIME.val(getTimerTime());
     FIELDS.PRIVATE_NOTES.prop('checked', true);
     formPrepareToShowInPopup();
+    FIELDS.STATUS.val(status);
     unsafeWindow.jQuery.fancybox(unsafeWindow._showReviewResultPopupLightBox);
 
 }
@@ -961,8 +944,8 @@ var _showLogTimePopupLightBox = {
     'height': '250'
 };
 unsafeWindow._showLogTimePopupLightBox = cloneInto(_showLogTimePopupLightBox, unsafeWindow);
-unsafeWindow._showLogTimePopupLightBox.onComplete = unsafeWindow._showLogTimePopupOnComplete;
-unsafeWindow._showLogTimePopupLightBox.onClosed = unsafeWindow._showLogTimePopupOnClosed;
+unsafeWindow._showLogTimePopupLightBox.afterShow = unsafeWindow._showLogTimePopupOnComplete;
+unsafeWindow._showLogTimePopupLightBox.afterClose = unsafeWindow._showLogTimePopupOnClosed;
 function _showLogTimePopup() {
     $('#log_time_container').show();
     unsafeWindow.jQuery.fancybox(unsafeWindow._showLogTimePopupLightBox);
