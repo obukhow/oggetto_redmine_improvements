@@ -11,7 +11,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.6
+// @version     3.0.7
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
@@ -1069,7 +1069,7 @@ function getTimeTrackerUrl(tracker, activity, filterByMe) {
  */
 function _parseRedmineHours(data) {
     var content = $($.parseHTML(data)).filter('.query-totals').text();
-    var result = content.match(/Hours\:\s([\.\d]{1,})/i);
+    var result = content.match(/\:\s([\.\d]{1,})/i);
     if (result) {
         return result[1];
     }
