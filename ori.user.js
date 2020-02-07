@@ -11,7 +11,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.8
+// @version     3.0.9
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
@@ -486,6 +486,18 @@ unsafeWindow.showConfigLightBox.afterShow = unsafeWindow.showConfigLightBoxOnCom
 unsafeWindow.showConfigLightBox.afterClose = unsafeWindow.showConfigLightBoxOnClosed;
 function showConfig() {
 
+    if (typeof(unsafeWindow.jQuery.fancybox) == "undefined") {
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.src = "/plugin_assets/redmine_lightbox2/javascripts/jquery.fancybox-2.1.5.pack.js?1580029733";
+        $("head").append(s);
+
+        var l = document.createElement('link');
+        l.setAttribute('rel', 'stylesheet');
+        l.setAttribute('type', 'text/css');
+        l.setAttribute('href', '/plugin_assets/redmine_lightbox2/stylesheets/jquery.fancybox-2.1.5.css?1580029733');
+        $("head").append(l);
+    }
     setTimeout(function () { // to allow inserted content be handled by browser
         if (unsafeWindow.jQuery('#configFormContainer').length < 1) {
             unsafeWindow.jQuery('body').append(GM_getResourceText("configForm_HTML"));
@@ -1008,8 +1020,10 @@ function addRtfBfqTime() {
             $('[data-toggle="popover"]').popover();
         });
         getApiKey().then(function(apiKey) {
+            let childIssues = $('div#issue_tree td.checkbox input').map(function(index, domElement) {return domElement.value;}).get();
             $.ajax({
-                url: '/time_entries.json?limit=1000&issue_id=' + issueID,
+                url: '/time_entries.json',
+                data: {"f": ['issue_id'], "op": {"issue_id": "~"}, "v": {"issue_id": [issueID]}, "limit": 1000},
                 headers: {"X-Redmine-API-Key": apiKey},
                 complete: function (response) {
                     let resp = JSON.parse(response.responseText);
@@ -1171,7 +1185,7 @@ if (!GM_getValue('user_role')) {
     unsafeWindow.showConfig();
 }
 
-if (!GM_getValue('version_4')) {
+if (!GM_getValue('version_4') && isIssuePage) {
     unsafeWindow.showVersion();
 }
 
