@@ -11,11 +11,11 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.7
+// @version     3.0.8
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
-// @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.html
+// @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
 // @grant       GM_getValue
@@ -180,19 +180,22 @@ function initFormElements() {
         'PRIVATE_FLAG': $('#issue_is_private'),
         'PAID': $('#time_entry_custom_field_values_32')
     };
-    document.getElementById('issue_status_id').onchange = undefined;
+    if ( document.getElementById('issue_status_id')) {
+        document.getElementById('issue_status_id').onchange = undefined;
+
+    }
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
     );
     if ((document.location.href.indexOf('time_entries') == -1) ||
         (document.location.href.indexOf('time_entries') > 0 && document.location.href.indexOf('edit') == -1)
-    ) {
+       ) {
         // set default values
         FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
         FIELDS.TIME_TYPE.val(TIME_TYPE.REGULAR); //type: regular
 
     }
-// hide fields
+    // hide fields
     hideFields();
 }
 
@@ -360,13 +363,13 @@ function addMoreButton() {
         $('a.icon-del').last().detach();
         $('a.icon-del').first().removeClass('btn btn-default');
         $('#moreMenuList').prepend($('<li>').append($('a.icon-del').removeClass('icon icon-del').
-            prepend('<span class="glyphicon glyphicon-trash"></span> ')));
+                                                    prepend('<span class="glyphicon glyphicon-trash"></span> ')));
     }
     if ($('a.icon-copy')) {
         $('a.icon-copy').last().detach();
         $('a.icon-copy').first().removeClass('btn btn-default');
         $('#moreMenuList').prepend($('<li>').append($('a.icon-copy').first().removeClass('icon icon-copy').
-            prepend('<span class="glyphicon glyphicon-duplicate"></span> ')));
+                                                    prepend('<span class="glyphicon glyphicon-duplicate"></span> ')));
 
     }
     var url = '/issues/context_menu?utf8=✓&&authenticity_token=' + token + '&ids[]=' + issueID +
@@ -383,7 +386,7 @@ function addMoreButton() {
                 var $chidLi = $(this);
                 if ($chidLi.children('a').hasClass('icon-checked')) {
                     $chidLi.children('a').removeClass('icon-checked').
-                        prepend('<span class="glyphicon glyphicon-ok"></span> ');
+                    prepend('<span class="glyphicon glyphicon-ok"></span> ');
                 }
                 if ($chidLi.children('a').hasClass('disabled')) {
                     $chidLi.addClass('disabled');
@@ -453,10 +456,14 @@ var showConfigLightBoxOnComplete = function () {
         $('#user_role').val(getMyRole());
         $('#reviewer').prop('checked', isReviewer());
         $('#activity').val(getDefaultActivity());
+        getApiKey().then(function(value) {
+            $('#api_key').val(value);
+        });
         $('#config_form').on('submit.save_config', function (e) {
             GM_setValue('user_role', $('#user_role').val());
             GM_setValue('is_reviewer', $('#reviewer').prop('checked'));
             GM_setValue('def_activity', $('#activity').val());
+            GM_setValue('api_key', $('#api_key').val());
             FIELDS.ACTIVITY.val(getDefaultActivity());
             unsafeWindow.jQuery.fancybox.close();
         });
@@ -499,7 +506,7 @@ var showVersionLightBox = {
 unsafeWindow.showVersionLightBox = cloneInto(showVersionLightBox, unsafeWindow);
 
 function showVersion() {
-      setTimeout(function () { // to allow inserted content be handled by browser
+    setTimeout(function () { // to allow inserted content be handled by browser
         if (unsafeWindow.jQuery('#versionPopup').length < 1) {
             unsafeWindow.jQuery('body').append(GM_getResourceText("version_HTML"));
         } else {
@@ -526,10 +533,10 @@ exportFunction(showVersion, unsafeWindow, {defineAs: "showVersion"});
  */
 function canStartProgress() {
     return (currentStatus == STATUS.NEW.TEXT ||
-    currentStatus == STATUS.FEEDBACK.TEXT ||
-    currentStatus == STATUS.REVIEW_FAILED.TEXT ||
-    currentStatus == STATUS.VERIFY_FAILED.TEXT ||
-    currentStatus == STATUS.FROZEN.TEXT);
+            currentStatus == STATUS.FEEDBACK.TEXT ||
+            currentStatus == STATUS.REVIEW_FAILED.TEXT ||
+            currentStatus == STATUS.VERIFY_FAILED.TEXT ||
+            currentStatus == STATUS.FROZEN.TEXT);
 }
 
 /**
@@ -745,24 +752,24 @@ var resolveIssueOnComplete = function () {
             stopTimer();
         });
         $('#update').on('click', 'div.jstTabs a.tab-preview', function(event){
-    var tab = $(event.target);
+            var tab = $(event.target);
 
-    var url = tab.data('url');
-    var form = tab.parents('form');
-    var jstBlock = tab.parents('.jstBlock');
+            var url = tab.data('url');
+            var form = tab.parents('form');
+            var jstBlock = tab.parents('.jstBlock');
 
-    var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
-    var attachments = form.find('.attachments_fields input').serialize();
+            var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
+            var attachments = form.find('.attachments_fields input').serialize();
 
-    unsafeWindow.jQuery.ajax({
-      url: url,
-      type: 'post',
-      data: "text=" + element + '&' + attachments,
-      success: function(data){
-        jstBlock.find('.wiki-preview').html(data);
-      }
-    });
-  });
+            unsafeWindow.jQuery.ajax({
+                url: url,
+                type: 'post',
+                data: "text=" + element + '&' + attachments,
+                success: function(data){
+                    jstBlock.find('.wiki-preview').html(data);
+                }
+            });
+        });
     }, 0);
 };
 exportFunction(resolveIssueOnComplete, unsafeWindow, {defineAs: "resolveIssueOnComplete"});
@@ -787,28 +794,28 @@ function resolveIssue() {
  * @private
  */
 var _showReviewResultPopupOnComplete = function () {
-        $('#issue-form').on('submit.reviewResult', function () {
-            localStorage.removeItem(issueID + '_review');
-        });
-        $('#update').on('click', 'div.jstTabs a.tab-preview', function(event){
-    var tab = $(event.target);
-
-    var url = tab.data('url');
-    var form = tab.parents('form');
-    var jstBlock = tab.parents('.jstBlock');
-
-    var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
-    var attachments = form.find('.attachments_fields input').serialize();
-
-    unsafeWindow.jQuery.ajax({
-      url: url,
-      type: 'post',
-      data: "text=" + element + '&' + attachments,
-      success: function(data){
-        jstBlock.find('.wiki-preview').html(data);
-      }
+    $('#issue-form').on('submit.reviewResult', function () {
+        localStorage.removeItem(issueID + '_review');
     });
-  });
+    $('#update').on('click', 'div.jstTabs a.tab-preview', function(event){
+        var tab = $(event.target);
+
+        var url = tab.data('url');
+        var form = tab.parents('form');
+        var jstBlock = tab.parents('.jstBlock');
+
+        var element = encodeURIComponent(jstBlock.find('.wiki-edit').val());
+        var attachments = form.find('.attachments_fields input').serialize();
+
+        unsafeWindow.jQuery.ajax({
+            url: url,
+            type: 'post',
+            data: "text=" + element + '&' + attachments,
+            success: function(data){
+                jstBlock.find('.wiki-preview').html(data);
+            }
+        });
+    });
 };
 exportFunction(_showReviewResultPopupOnComplete, unsafeWindow, {defineAs: "_showReviewResultPopupOnComplete"});
 var _showReviewResultPopupOnClosed = function () {
@@ -974,7 +981,7 @@ function showTotalRegularTime() {
  */
 function showMyTime() {
     $('<div class="spent-by-me attribute"><div class="label">' + TEXT.SPENT_BY_ME +
-        ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
+      ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
     var totalHours = 0, regularHours = 0, fuckupHours = 0;
     var tUrl = getTimeTrackerUrl(false, false, true);
     var rUrl = getTimeTrackerUrl(TIME_TYPE.REGULAR, false, true);
@@ -984,7 +991,7 @@ function showMyTime() {
         regularHours = _parseRedmineHours(rData[0]);
         fuckupHours = _parseRedmineHours(fData[0]);
         $('div.value-spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
-            + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
+                                        + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
     });
     addRtfBfqTime();
 }
@@ -995,46 +1002,62 @@ function showMyTime() {
 function addRtfBfqTime() {
 
     if ($('div.spent-time>div.value').length > 0) {
-    $('div.spent-time>div.value').prepend('<span id="rtfbfq" class="icon icon-time-add" aria-hidden="true" data-html="true" data-trigger="click" data-toggle="popover" data-content="' + TEXT.LOADING + '"></span>');
+        $('div.spent-time>div.value').prepend('<span id="rtfbfq" class="icon icon-time-add" aria-hidden="true" data-html="true" data-trigger="click" data-toggle="popover" data-content="' + TEXT.LOADING + '"></span>');
 
-    $(function () {
-        $('[data-toggle="popover"]').popover();
-    });
-    $.ajax({
-        url: 'http://new.oggy.co/api/timeEntry?id=' + issueID,
-        dataType: 'jsonp',
-        jsonpCallback: 'insertRtfBfqTable'
-    });
+        $(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+        getApiKey().then(function(apiKey) {
+            $.ajax({
+                url: '/time_entries.json?limit=1000&issue_id=' + issueID,
+                headers: {"X-Redmine-API-Key": apiKey},
+                complete: function (response) {
+                    let resp = JSON.parse(response.responseText);
+                    let time = {"total": 0, "types": {}};
+                    for (let i = 0; i < resp.time_entries.length; i++) {
+                        let entry = resp.time_entries[i];
+                        time.total += entry.hours;
+                        let type = entry.custom_fields[0]["value"];
+                        if (!time.types.hasOwnProperty(type)) {
+                            time.types[type] = {"id": entry.custom_fields[0]["id"], "name": entry.custom_fields[0]["value"], "hours": 0, "activities": {}};
+                        }
+                        time.types[type]["hours"] += entry.hours;
+                        if (!time.types[type]["activities"].hasOwnProperty(entry.activity.id)) {
+                            time.types[type]["activities"][entry.activity.id] = {"id": entry.activity.id, "name": entry.activity.name, "hours": 0};
+                        }
+                        time.types[type]["activities"][entry.activity.id]["hours"] += entry.hours;
+                    }
+                    insertRtfBfqTable(time);
+                }
+            });
+        });
     }
 }
 
 /**
  * Insert RtfBfq table
  */
-function insertRtfBfqTable(data) {
-    var time = {RB: 0, RF: 0, RT: 0, TB: 0, TF: 0, TT: 0, FB: 0, FF: 0, FT: 0};
-    $.extend(time, data);
-    document.getElementById('rtfbfq').dataset.content = '<table class="rtfbfq">' +
-        '<tr><td></td><td class="rtfbfqHeader">B</td><td class="rtfbfqHeader">F</td><td class="rtfbfqHeader">Q</td></tr>' +
-        '<tr>' +
-        '<td class="rtfbfqHeader">R</td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.REGULAR, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.RB + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.REGULAR, ACTIVITIES.FRONTEND_DEVELOPMENT) + '" target="_blank">' + time.RF + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.REGULAR, ACTIVITIES.TESTING) + '" target="_blank">' + time.RT + '</a></td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td class="rtfbfqHeader">T</td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.TEAM_FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.TB + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.TEAM_FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.TF + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.TEAM_FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.TT + '</a></td>' +
-        '</tr>' +
-        '<tr>' +
-        '<td class="rtfbfqHeader">F</td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.FB + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.FF + '</a></td>' +
-        '<td><a href="' + getTimeTrackerUrl(TIME_TYPE.FUCKUP, ACTIVITIES.BACKEND_DEVELOPMENT) + '" target="_blank">' + time.FT + '</a></td>' +
-        '</tr>' +
-        '</table>';
+function insertRtfBfqTable(time) {
+
+    let content = '<table class="rtfbfq">';
+    for (var typeId in time.types) {
+        if (time.types.hasOwnProperty(typeId)) {
+            let type = time['types'][typeId];
+            content += "<tr><th align='left'>" + type.name + "</th><th>" + type.hours.toFixed(2) + "</th></tr>";
+
+            for (var activity in type.activities) {
+                if (type.activities.hasOwnProperty(activity)) {
+                    let act = type['activities'][activity];
+                    content += "<tr><td align='left' style=\"font-size: 12px;padding-left: 15px;\">" + act.name + '</td><td style=\"font-size: 12px;\"><a href="' + getTimeTrackerUrl(type.name, act.id) + '" target="_blank">' + act.hours.toFixed(2) + '</a></td>';
+
+                }
+            }
+
+
+        }
+    }
+    content += '</table>';
+    document.getElementById('rtfbfq').dataset.content = content;
 }
 
 /**
@@ -1076,58 +1099,71 @@ function _parseRedmineHours(data) {
     return 0;
 }
 
-
+async function getApiKey() {
+    if (GM_getValue('api_key')) {
+        return GM_getValue('api_key');
+    }
+    unsafeWindow.jQuery.ajax({
+        url: '/my/api_key',
+        complete: function(response) {
+            var apiKey = response.responseText.match(/<pre>([a-z0-9]{40})<\/pre>/i);
+            console.log(apiKey);
+            GM_setValue('api_key', apiKey[1]);
+            return apiKey;
+        }
+    });
+}
 
 
 if (isIssuePage) {
-//add buttons
-$(function() {
-    isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
-    myUserLink = $('#loggedas a').attr('href');
-    myID = myUserLink.match(/(\d*)$/i)[0];
-    currentStatus = $('div.status>div.value').html();
-    token = $('meta[name="csrf-token"]').attr('content');
-    $buttonsContainer = $('div#content>div.contextual');
-    TEXT = ($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
+    //add buttons
+    $(function() {
+        isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
+        myUserLink = $('#loggedas a').attr('href');
+        myID = myUserLink.match(/(\d*)$/i)[0];
+        currentStatus = $('div.status>div.value').html();
+        token = $('meta[name="csrf-token"]').attr('content');
+        $buttonsContainer = $('div#content>div.contextual');
+        TEXT = ($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
 
 
-if (isAssignedToMe) {
-    if (canStartProgress()) {
-        addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play');
-    } else if (currentStatus == STATUS.IN_PROGRESS.TEXT) {
-        if (isOnReview()) {
-            addButton(TEXT.REVIEW_PASSED, 'reviewPassed()', 'icon-good');
-            showTimer();
-            addButton(TEXT.REVIEW_FAILED, 'reviewFailed()', 'icon-bad');
-        } else if (isOnTesting()) {
-            addButton(TEXT.TEST_PASSED, 'testPassed()', 'icon-good');
-            showTimer();
-            addButton(TEXT.TEST_FAILED, 'testFailed()', 'icon-bad');
+        if (isAssignedToMe) {
+            if (canStartProgress()) {
+                addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play');
+            } else if (currentStatus == STATUS.IN_PROGRESS.TEXT) {
+                if (isOnReview()) {
+                    addButton(TEXT.REVIEW_PASSED, 'reviewPassed()', 'icon-good');
+                    showTimer();
+                    addButton(TEXT.REVIEW_FAILED, 'reviewFailed()', 'icon-bad');
+                } else if (isOnTesting()) {
+                    addButton(TEXT.TEST_PASSED, 'testPassed()', 'icon-good');
+                    showTimer();
+                    addButton(TEXT.TEST_FAILED, 'testFailed()', 'icon-bad');
+                } else {
+                    addButton(TEXT.RESOLVE_ISSUE, 'resolveIssue()', 'icon-ok');
+                    showTimer();
+                    addButton(TEXT.FROZE_ISSUE, 'frozeProgress()', 'icon-froze');
+                }
+            } else if (canStartTest()) {
+                addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play', 'glyphicon-play-circle');
+            } else if (canClose()) {
+                addButton(TEXT.CLOSE_ISSUE, 'closeIssue()', 'icon-lock');
+            } else if (canDoReview()) {
+                addButton(TEXT.START_REVIEW, 'startReview()', 'icon-play');
+            }
         } else {
-            addButton(TEXT.RESOLVE_ISSUE, 'resolveIssue()', 'icon-ok');
-            showTimer();
-            addButton(TEXT.FROZE_ISSUE, 'frozeProgress()', 'icon-froze');
+            addButton(TEXT.ASSIGN_TO_ME, 'assignToMe()', 'icon-user');
         }
-    } else if (canStartTest()) {
-        addButton(getStartProgressText(), getStartProgressFunction() + '()', 'icon-play', 'glyphicon-play-circle');
-    } else if (canClose()) {
-        addButton(TEXT.CLOSE_ISSUE, 'closeIssue()', 'icon-lock');
-    } else if (canDoReview()) {
-        addButton(TEXT.START_REVIEW, 'startReview()', 'icon-play');
-    }
-} else {
-    addButton(TEXT.ASSIGN_TO_ME, 'assignToMe()', 'icon-user');
-}
 
-    addMoreButton();
-    showTotalRegularTime();
-    showMyTime();
-    addHideFormFieldsControl();
-    initFormElements();
-    //change link styles
+        addMoreButton();
+        showTotalRegularTime();
+        showMyTime();
+        addHideFormFieldsControl();
+        initFormElements();
+        //change link styles
 
-    $('a.icon-edit').append('…');
-});
+        $('a.icon-edit').append('…');
+    });
 
 }
 
@@ -1164,6 +1200,7 @@ exportFunction(formPrepareToShowInPopup, unsafeWindow, {defineAs: "formPrepareTo
 exportFunction(formReturnToPreviousStateAfterPopupClose, unsafeWindow, {defineAs: "formReturnToPreviousStateAfterPopupClose"});
 exportFunction(insertRtfBfqTable, unsafeWindow, {defineAs: "insertRtfBfqTable"});
 exportFunction(showVersion, unsafeWindow, {defineAs: "showVersion"});
+exportFunction(getApiKey, unsafeWindow, {defineAs: "getApiKey"});
 
 
 unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
