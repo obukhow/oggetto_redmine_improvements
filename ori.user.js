@@ -11,7 +11,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.9
+// @version     3.0.10
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
@@ -100,6 +100,8 @@ var currentStatus = '';
 var timeKey = issueID + '_startTime';
 var token = '';
 var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
+var time = {"total": 0, "types": {}, "me": {"total": 0, "r": 0, "f": 0}, "regular": 0, "inited": false, "loading": false};
+
 
 var $buttonsContainer = '';
 var TEXT = EN_TEXT;($('a.my-account').text() == 'My account') ? EN_TEXT : RU_TEXT;
@@ -349,67 +351,20 @@ function addButton(text, action, className) {
  * @return void
  */
 function addMoreButton() {
-    var buttonHtml =
-        '<a href="#" class="btn btn-default dropdown-toggle" type="button" id="moreMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
-        TEXT.MORE +
-        '<span class="caret"></span>' +
-        '</a>' +
-        '<ul class="dropdown-menu pull-right" aria-labelledby="moreMenu" id="moreMenuList">' +
-        '<li role="separator" class="divider"></li>' +
-        '<li><a href="#" onclick="showConfig(); return false;"><span class="glyphicon glyphicon-cog"></span> ' + TEXT.ROLE_SETTINGS + '</a></li>' +
-        '</ul>';
-    $('.btn-group').not('.manage-issue-buttons').first().append(buttonHtml);
-    if ($('a.icon-del')) {
-        $('a.icon-del').last().detach();
-        $('a.icon-del').first().removeClass('btn btn-default');
-        $('#moreMenuList').prepend($('<li>').append($('a.icon-del').removeClass('icon icon-del').
-                                                    prepend('<span class="glyphicon glyphicon-trash"></span> ')));
-    }
-    if ($('a.icon-copy')) {
-        $('a.icon-copy').last().detach();
-        $('a.icon-copy').first().removeClass('btn btn-default');
-        $('#moreMenuList').prepend($('<li>').append($('a.icon-copy').first().removeClass('icon icon-copy').
-                                                    prepend('<span class="glyphicon glyphicon-duplicate"></span> ')));
-
-    }
     var url = '/issues/context_menu?utf8=✓&&authenticity_token=' + token + '&ids[]=' + issueID +
         '&back_url=/issues/' + issueID;
-
-    $.get(url).done(function (data) {
-        var $lis = $($.parseHTML(data)).children();
-
-        $lis.slice(1, 8).each(function () {
-            var $li = $(this);
-            $li.addClass('status').children('a').addClass('trigger left-caret');
-            $li.addClass('status').children('ul').addClass('dropdown-menu sub-menu');
-            $li.children('ul').children('li').each(function () {
-                var $chidLi = $(this);
-                if ($chidLi.children('a').hasClass('icon-checked')) {
-                    $chidLi.children('a').removeClass('icon-checked').
-                    prepend('<span class="glyphicon glyphicon-ok"></span> ');
-                }
-                if ($chidLi.children('a').hasClass('disabled')) {
-                    $chidLi.addClass('disabled');
-                }
-            });
-            $('#moreMenuList').prepend($li);
-        });
-        $(".dropdown-menu > li > a.trigger").on("click", function (e) {
-            var current = $(this).next();
-            var grandparent = $(this).parent().parent();
-            if ($(this).hasClass('left-caret') || $(this).hasClass('right-caret'))
-                $(this).toggleClass('right-caret left-caret');
-            grandparent.find('.left-caret').not(this).toggleClass('right-caret left-caret');
-            grandparent.find(".sub-menu:visible").not(current).hide();
-            current.toggle();
-            e.stopPropagation();
-        });
-        $(".dropdown-menu > li > a:not(.trigger)").on("click", function () {
-            var root = $(this).closest('.dropdown');
-            root.find('.left-caret').toggleClass('right-caret left-caret');
-            root.find('.sub-menu:visible').hide();
-        });
-    });
+    var buttonHtml =
+        '<form data-cm-url="' + url + '"><a href="#" class="icon" onclick="contextMenuShow(event);" type="button"  id="moreMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+        TEXT.MORE +
+        '<span class="caret"></span>' +
+        '</a></form>';
+    $('.manage-issue-buttons').first().parent().children().first().append(buttonHtml);
+    if ($('a.icon-del')) {
+        $('a.icon-del').first().detach();
+    }
+    if ($('a.icon-copy')) {
+        $('a.icon-copy').first().detach();
+    }
 }
 
 /**
@@ -983,8 +938,8 @@ function closeIssue() {
  */
 function showTotalRegularTime() {
     var url = getTimeTrackerUrl(TIME_TYPE.REGULAR);
-    $.get(url).done(function (data) {
-        $("div.spent-time>div.value").append(' (R: <a href="' + url + '">' + _parseRedmineHours(data) + '</a>)');
+    getTimeData().then(function(time) {
+        $("div.spent-time>div.value").append(' (R: <a href="' + url + '">' + time.regular.toFixed(2) + '</a>)');
     });
 }
 
@@ -994,16 +949,13 @@ function showTotalRegularTime() {
 function showMyTime() {
     $('<div class="spent-by-me attribute"><div class="label">' + TEXT.SPENT_BY_ME +
       ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
-    var totalHours = 0, regularHours = 0, fuckupHours = 0;
-    var tUrl = getTimeTrackerUrl(false, false, true);
-    var rUrl = getTimeTrackerUrl(TIME_TYPE.REGULAR, false, true);
-    var fUrl = getTimeTrackerUrl(TIME_TYPE.FUCKUP, false, true);
-    $.when($.get(tUrl), $.get(rUrl), $.get(fUrl)).done(function (tData, rData, fData) {
-        totalHours = _parseRedmineHours(tData[0]);
-        regularHours = _parseRedmineHours(rData[0]);
-        fuckupHours = _parseRedmineHours(fData[0]);
-        $('div.value-spent-by-me').html('<a href="' + tUrl + '">' + totalHours + ' hours</a> (R: <a href="' + rUrl + '">'
-                                        + regularHours + '</a>, F: <a href="' + fUrl + '">' + fuckupHours + '</a>)');
+    getTimeData().then(function(time) {
+        var tUrl = getTimeTrackerUrl(false, false, true);
+        var rUrl = getTimeTrackerUrl(TIME_TYPE.REGULAR, false, true);
+        var fUrl = getTimeTrackerUrl(TIME_TYPE.FUCKUP, false, true);
+
+        $('div.value-spent-by-me').html('<a href="' + tUrl + '">' + time.me.total.toFixed(2) + ' hours</a> (R: <a href="' + rUrl + '">'
+                                        + time.me.r.toFixed(2) + '</a>, F: <a href="' + fUrl + '">' + time.me.f.toFixed(2) + '</a>)');
     });
     addRtfBfqTime();
 }
@@ -1019,33 +971,70 @@ function addRtfBfqTime() {
         $(function () {
             $('[data-toggle="popover"]').popover();
         });
-        getApiKey().then(function(apiKey) {
-            let childIssues = $('div#issue_tree td.checkbox input').map(function(index, domElement) {return domElement.value;}).get();
-            $.ajax({
-                url: '/time_entries.json',
-                data: {"f": ['issue_id'], "op": {"issue_id": "~"}, "v": {"issue_id": [issueID]}, "limit": 1000},
-                headers: {"X-Redmine-API-Key": apiKey},
-                complete: function (response) {
-                    let resp = JSON.parse(response.responseText);
-                    let time = {"total": 0, "types": {}};
-                    for (let i = 0; i < resp.time_entries.length; i++) {
-                        let entry = resp.time_entries[i];
-                        time.total += entry.hours;
-                        let type = entry.custom_fields[0]["value"];
-                        if (!time.types.hasOwnProperty(type)) {
-                            time.types[type] = {"id": entry.custom_fields[0]["id"], "name": entry.custom_fields[0]["value"], "hours": 0, "activities": {}};
-                        }
-                        time.types[type]["hours"] += entry.hours;
-                        if (!time.types[type]["activities"].hasOwnProperty(entry.activity.id)) {
-                            time.types[type]["activities"][entry.activity.id] = {"id": entry.activity.id, "name": entry.activity.name, "hours": 0};
-                        }
-                        time.types[type]["activities"][entry.activity.id]["hours"] += entry.hours;
-                    }
-                    insertRtfBfqTable(time);
-                }
-            });
+        getTimeData().then(function (time) {
+            insertRtfBfqTable(time);
         });
     }
+}
+function prepareTimeData(resp) {
+    for (let i = 0; i < resp.time_entries.length; i++) {
+        let entry = resp.time_entries[i];
+        time.total += entry.hours;
+        let type = entry.custom_fields[0]["value"];
+        if (!time.types.hasOwnProperty(type)) {
+            time.types[type] = {"id": entry.custom_fields[0]["id"], "name": entry.custom_fields[0]["value"], "hours": 0, "activities": {}};
+        }
+        time.types[type]["hours"] += entry.hours;
+        if (!time.types[type]["activities"].hasOwnProperty(entry.activity.id)) {
+            time.types[type]["activities"][entry.activity.id] = {"id": entry.activity.id, "name": entry.activity.name, "hours": 0};
+        }
+        time.types[type]["activities"][entry.activity.id]["hours"] += entry.hours;
+        if (entry.custom_fields[0].value == TIME_TYPE.REGULAR) {
+            time.regular += entry.hours;
+        }
+        if (entry.user.id == myID) {
+            time.me.total += entry.hours;
+            if (entry.custom_fields[0].value == TIME_TYPE.REGULAR) {
+                time.me.r += entry.hours;
+            }
+            if (entry.custom_fields[0].value == TIME_TYPE.FUCKUP) {
+                time.me.f += entry.hours;
+            }
+        }
+    }
+}
+
+async function getTimeData() {
+    return new Promise(function(resolve, reject) {
+        if (time.inited) {
+            resolve(time);
+            return;
+        }
+        if (!time.loading) {
+            time.loading = true;
+            getApiKey().then(function(apiKey) {
+                $.ajax({
+                    url: '/time_entries.json',
+                    data: {"f": ['issue_id'], "op": {"issue_id": "~"}, "v": {"issue_id": [issueID]}, "limit": 1000},
+                    headers: {"X-Redmine-API-Key": apiKey},
+                    complete: function (response) {
+                        let resp = JSON.parse(response.responseText);
+                        prepareTimeData(resp);
+                        time.inited = true;
+                        time.loading = false;
+                    }
+                });
+            });
+        }
+        let timerId = setInterval(function() {
+            if (time.inited) {
+                resolve(time);
+                clearInterval(timerId);
+            }
+        }, 100);
+    });
+
+
 }
 
 /**

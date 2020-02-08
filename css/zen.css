@@ -146,6 +146,7 @@ h2, .wiki h1 {
     margin-right: 5px;
     color: #fff;
     opacity: 0.3;
+    font-weight:normal;
 }
 #main-menu li a.overview:before {
     content: '\f1e5';
