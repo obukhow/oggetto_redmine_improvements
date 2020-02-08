@@ -209,14 +209,14 @@ h2, .wiki h1 {
 .context-menu-selection,.context-menu-selection:hover {
     background-color: #2d3646 !important;
 }
-#context-menu, #context-menu ul li ul {background-color: #fff; border: none; border-radius: 3px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.5);}
+#context-menu, #context-menu ul li ul {background-color: #fff !important; border: none !important; border-radius: 3px !important; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.5) !important;}
 #context-menu ul {
-    padding: 2px 0;
-    border: none;
+    padding: 2px 0 !important;
+    border: none !important;
 }
-#context-menu li {padding: 5px 2px; border:none;}
-#context-menu li:hover {border:none;border-left:1px solid #6d7a91;border-right:1px solid #6d7a91; color:#fff; border-radius:0; background: #2d3646; padding:5px 1px;}
-#context-menu li:hover>a {color: #fff;}
+#context-menu li {padding: 5px 2px !important; border:none !important;}
+#context-menu li:hover {border:none !important;border-left:1px solid #6d7a91 !important;border-right:1px solid #6d7a91 !important; color:#fff !important; border-radius:0 !important; background: #2d3646 !important; padding:5px 1px !important;}
+#context-menu li:hover>a {color: #fff !important;}
 
 
 div.issue {
