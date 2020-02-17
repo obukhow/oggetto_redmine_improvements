@@ -11,10 +11,10 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.10
+// @version     3.0.11
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=6
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=8
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -33,7 +33,7 @@ var bootstrap3_CssSrc = GM_getResourceText("bootstrap3_CSS");
 GM_addStyle(select4_CssSrc);
 GM_addStyle(bootstrap3_CssSrc);
 
-GM_addStyle(".select2-container .select2-choice {height: auto; line-height: 1.4em;} .select2-container .select2-choice .select2-arrow b {background-image: url('http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.8/select2.png') !important;} .select2-container--open{ z-index:10000;} .fancybox-content .select2-container--below {width: 90% !important;}");
+GM_addStyle(".select2-container--open{ z-index:10000;} .fancybox-content .select2-container--below {width: 90% !important;}");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
 GM_addStyle("table.rtfbfq {text-align:right; border:1px solid #fff;} .rtfbfqHeader {font-weight:bold; text-align:center; color: #DDD; min-width: 20px;}");
@@ -61,9 +61,9 @@ var RU_TEXT = {
     CLOSE_ISSUE: 'Закрыть',
     START_TESTING: 'Начать тестирование',
     CONTINUE_PROGRESS: 'Продолжить работу',
-    START_PROGRESS: 'Продолжить работу',
+    START_PROGRESS: 'Начать работу',
     RESOLVE_ISSUE: 'Завершить…',
-    FROZE_ISSUE: 'На паузу',
+    FROZE_ISSUE: 'Заморозить',
     ASSIGN_TO_ME: 'Назначить на меня',
     SPENT_BY_ME: 'Затрачено мной',
     LOADING: 'загрузка...',
@@ -83,7 +83,7 @@ var EN_TEXT = {
     CONTINUE_PROGRESS: 'Continue Progress',
     START_PROGRESS: 'Start Progress',
     RESOLVE_ISSUE: 'Resolve…',
-    FROZE_ISSUE: 'Froze',
+    FROZE_ISSUE: 'Freeze',
     ASSIGN_TO_ME: 'Assign to Me',
     SPENT_BY_ME: 'Spent by me',
     LOADING: 'loading...',
@@ -100,6 +100,7 @@ var currentStatus = '';
 var timeKey = issueID + '_startTime';
 var token = '';
 var isIssuePage = location.pathname.match(/\/issues\/[\d]{1,}$/i) !== null;
+var isLogTimePage = location.pathname.match(/\/time_entries\/new$/i) !== null;
 var time = {"total": 0, "types": {}, "me": {"total": 0, "r": 0, "f": 0}, "regular": 0, "inited": false, "loading": false};
 
 
@@ -189,14 +190,7 @@ function initFormElements() {
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
     );
-    if ((document.location.href.indexOf('time_entries') == -1) ||
-        (document.location.href.indexOf('time_entries') > 0 && document.location.href.indexOf('edit') == -1)
-       ) {
-        // set default values
-        FIELDS.ACTIVITY.val(getDefaultActivity()); // activity: backend development
-        FIELDS.TIME_TYPE.val(TIME_TYPE.REGULAR); //type: regular
 
-    }
     // hide fields
     hideFields();
 }
@@ -358,7 +352,7 @@ function addMoreButton() {
         TEXT.MORE +
         '<span class="caret"></span>' +
         '</a></form>';
-    $('.manage-issue-buttons').first().parent().children().first().append(buttonHtml);
+    $('.manage-issue-buttons').first().parent().children().filter('.contextual').first().append(buttonHtml);
     if ($('a.icon-del')) {
         $('a.icon-del').first().detach();
     }
@@ -1168,6 +1162,12 @@ if (isIssuePage) {
         $('a.icon-edit').append('…');
     });
 
+}
+if (isLogTimePage) {
+   $(function() {
+       $('#time_entry_activity_id').val(getDefaultActivity());
+       $('#time_entry_custom_field_values_12').val(TIME_TYPE.REGULAR);
+   });
 }
 
 if (!GM_getValue('user_role')) {
