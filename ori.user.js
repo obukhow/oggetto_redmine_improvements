@@ -11,7 +11,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.11
+// @version     3.0.12
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=8
@@ -1100,15 +1100,13 @@ async function getApiKey() {
     if (GM_getValue('api_key')) {
         return GM_getValue('api_key');
     }
-    unsafeWindow.jQuery.ajax({
+    let resp = await unsafeWindow.jQuery.ajax({
         url: '/my/api_key',
-        complete: function(response) {
-            var apiKey = response.responseText.match(/<pre>([a-z0-9]{40})<\/pre>/i);
-            console.log(apiKey);
-            GM_setValue('api_key', apiKey[1]);
-            return apiKey;
-        }
-    });
+
+   });
+    const apiKey = resp.match(/<pre>([a-z0-9]{40})<\/pre>/i);
+    GM_setValue('api_key', apiKey[1]);
+    return apiKey[1];
 }
 
 
