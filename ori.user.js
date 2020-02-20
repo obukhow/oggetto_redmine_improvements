@@ -11,7 +11,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.12
+// @version     3.0.13
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
 // @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=8
@@ -187,6 +187,9 @@ function initFormElements() {
         document.getElementById('issue_status_id').onchange = undefined;
 
     }
+
+    FIELDS.ACTIVITY.val(getDefaultActivity()); // set default activity
+    FIELDS.TIME_TYPE.val(TIME_TYPE.REGULAR); //type: regular
     FIELDS.ASSIGNEE.css('width', '60%');
     FIELDS.ASSIGNEE.select2(
     );
