@@ -213,11 +213,21 @@ h2, .wiki h1 {
 #context-menu ul {
     padding: 2px 0 !important;
     border: none !important;
+    width: 200px !important;
 }
 #context-menu li {padding: 5px 2px !important; border:none !important;}
 #context-menu li:hover {border:none !important;border-left:1px solid #6d7a91 !important;border-right:1px solid #6d7a91 !important; color:#fff !important; border-radius:0 !important; background: #2d3646 !important; padding:5px 1px !important;}
+#context-menu a {padding-left: 32px !important;}
+#context-menu a.icon, #context-menu a.icon-checked {padding-left: 10px !important;}
 #context-menu li:hover>a {color: #fff !important;}
-
+#context-menu li.folder > ul {
+    left: 198px !important;
+}
+#context-menu li a.icon::before,#context-menu li a.icon-checked::before {
+    margin-right: .6em !important;
+}
+#context-menu li a.icon-checked::before {color: #47bac1;}
+#context-menu a.icon-checked { background-image:none !important;}
 
 div.issue {
     border:none;
