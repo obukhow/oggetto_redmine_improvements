@@ -340,10 +340,13 @@ table.list td {
 table.list:not(.odd-even) tbody tr:nth-child(2n+1), .odd, #issue-changesets div.changeset:nth-child(2n+1) {
     background: #fff;
 }
-table.list tr.issue.tracker-1 td.id a { display:block; border: 1px solid #f44455; color: #f44455; border-radius: 3px; padding: 3px;} 
-table.list tr.issue.tracker-2 td.id a { display:block; border: 1px solid #5fc27e; color: #5fc27e; border-radius: 3px; padding: 3px;} 
-table.list tr.issue.tracker-3 td.id a,table.list tr.issue.tracker-4 td.id a { display:block; border: 1px solid  #5b7dff; color:  #5b7dff; border-radius: 3px; padding: 3px;}
-table.list tr.issue.tracker-5 td.id a { display:block; border: 1px solid #333; color: #333; border-radius: 3px; padding: 3px;} 
+table.list tr.issue.tracker-1 td.id a, li.issue.tracker-1 a span.id { display:block; border: 1px solid #f44455; color: #f44455; border-radius: 3px; padding: 3px;} 
+table.list tr.issue.tracker-2 td.id a, li.issue.tracker-2 a span.id { display:block; border: 1px solid #5fc27e; color: #5fc27e; border-radius: 3px; padding: 3px;} 
+table.list tr.issue.tracker-3 td.id a,table.list tr.issue.tracker-4 td.id a, li.issue.tracker-3 a span.id, li.issue.tracker-4 a span.id { display:block; border: 1px solid  #5b7dff; color:  #5b7dff; border-radius: 3px; padding: 3px;}
+table.list tr.issue.tracker-5 td.id a, li.issue.tracker-5 a span.id { display:block; border: 1px solid #333; color: #333; border-radius: 3px; padding: 3px;} 
+
+li.issue a span.id,li.issue a span.project {display: inline-block !important; font-size:11px;padding: 2px; margin-top: 3px;}
+li.issue a span.project {margin-left:10px; color:#fff; border-radius:3px; border:1px solid #47bac1; background-color:#47bac1; opacity:0.5;}
 
 table.list tr.issue td.priority, .priority .value { content: ''; font-size:0; padding-right: 10px; line-height: 1.5em;}
 table.list tr.issue td.priority:before, .priority .value:before {display:inline-block; font-size:12px; text-transform:uppercase; border-radius:3px; padding: 5px; width: 70px; text-align: center; line-height: 1.5em;}

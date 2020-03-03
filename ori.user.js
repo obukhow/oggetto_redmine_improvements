@@ -11,9 +11,9 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.15
+// @version     3.0.16
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=9
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=10
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -1103,10 +1103,52 @@ async function getApiKey() {
     let resp = await unsafeWindow.jQuery.ajax({
         url: '/my/api_key',
 
-   });
+    });
     const apiKey = resp.match(/<pre>([a-z0-9]{40})<\/pre>/i);
     GM_setValue('api_key', apiKey[1]);
     return apiKey[1];
+}
+
+function logIssueHistory() {
+    let history = GM_getValue('issue_history', []);
+    history = history.filter(function(item) {
+        return item.issueID != issueID;
+    });
+    history.unshift({
+        'project': document.getElementsByTagName('h1')[0].innerText,
+        'issueID': issueID,
+        'name': document.getElementsByClassName('subject')[0].getElementsByTagName('h3')[0].innerText,
+        'tracker': document.getElementsByTagName('h2')[0].innerText,
+        'link': window.location.origin + window.location.pathname,
+        'trackerClass': document.getElementsByClassName('issue')[0].className.match(/(tracker-[\d])/im)[0]
+    });
+    history.slice(0, 12);
+    GM_setValue('issue_history', history);
+}
+function addHistoryToMenu() {
+    let history = GM_getValue('issue_history', []);
+    history = history.filter(function(item) {
+        return item.issueID != issueID;
+    });
+    let output = '<ul class="menu-children">';
+
+    for (let i = 0; i < Math.min(history.length, 10); i++) {
+        let item = history[i];
+        output += '<li class="issue ' + item.trackerClass + '">';
+        output += '<a href="' + item.link + '">';
+
+        output += item.name;
+        output += '</br>';
+
+        output += '<span class="id">' + item.issueID + '</span><span class="project">';
+        output += item.project;
+        output += '</span>';
+        output += '</a>';
+        output +='</li>';
+
+    }
+    output += '</ul>';
+    $('#main-menu a.issues').parent().append(output);
 }
 
 
@@ -1155,17 +1197,24 @@ if (isIssuePage) {
         showMyTime();
         addHideFormFieldsControl();
         initFormElements();
+        logIssueHistory();
         //change link styles
 
         $('a.icon-edit').append('…');
     });
 
 }
+$(function() {
+    if (document.getElementById('main-menu')) {
+        addHistoryToMenu();
+
+    }
+});
 if (isLogTimePage) {
-   $(function() {
-       $('#time_entry_activity_id').val(getDefaultActivity());
-       $('#time_entry_custom_field_values_12').val(TIME_TYPE.REGULAR);
-   });
+    $(function() {
+        $('#time_entry_activity_id').val(getDefaultActivity());
+        $('#time_entry_custom_field_values_12').val(TIME_TYPE.REGULAR);
+    });
 }
 
 if (!GM_getValue('user_role')) {
@@ -1208,4 +1257,3 @@ unsafeWindow.STATUS = cloneInto(STATUS, unsafeWindow);
 unsafeWindow.ACTIVITIES = cloneInto(ACTIVITIES, unsafeWindow);
 unsafeWindow.ROLES = cloneInto(ROLES, unsafeWindow);
 unsafeWindow.FIELDS = cloneInto(FIELDS, unsafeWindow);
-
