@@ -11,10 +11,9 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.14
+// @version     3.0.15
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    bootstrap3_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/bootstrap.css?v=2020
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=8
+// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=9
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -29,9 +28,7 @@
 var zen_CssSrc = GM_getResourceText("zen_CSS");
 GM_addStyle(zen_CssSrc);
 var select4_CssSrc = GM_getResourceText("select4_CSS");
-var bootstrap3_CssSrc = GM_getResourceText("bootstrap3_CSS");
 GM_addStyle(select4_CssSrc);
-GM_addStyle(bootstrap3_CssSrc);
 
 GM_addStyle(".select2-container--open{ z-index:10000;} .fancybox-content .select2-container--below {width: 90% !important;}");
 GM_addStyle("#fancybox-content .tabular p{padding-left:100px;} #config_form p {padding-left:200px !important;}");
