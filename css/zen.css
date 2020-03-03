@@ -223,6 +223,7 @@ h2, .wiki h1 {
 #context-menu li.folder > ul {
     left: 198px !important;
 }
+#context-menu.reverse-x li.folder>ul { right:198px !important; left:auto !important;}
 #context-menu li a.icon::before,#context-menu li a.icon-checked::before {
     margin-right: .6em !important;
 }
