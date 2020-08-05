@@ -254,7 +254,10 @@ div.attributes {
 #history  {
   border: none;   
 }
-
+#sidebar {
+    background: none !important;
+    border: none !important;
+}
 #sidebar h3 {
     text-transform:uppercase;
     color: #8ea2e1;
@@ -320,6 +323,12 @@ div.journal.private-notes .wiki {
 }
 div.journal ul.details i{
     color: #47bac1;
+}
+#history .tab-content {
+    border:none !important;
+}
+div.journal h4 img.gravatar {
+   margin-left: 0px !important;
 }
 table.list {
     font-size:13px;
@@ -704,4 +713,8 @@ fieldset#filters td.values input { height:auto;}
   border-top: 4px solid \9;
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
+}
+
+#update .tabular p {
+    padding-left: 100px !important;
 }
