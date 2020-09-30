@@ -384,7 +384,7 @@ span.pagination {background-color: #fff; margin:0; padding: 15px; margin-top: -5
 .pagination ul.pages li {border-radius: 3px; margin-right: 5px; padding:5px; background-color: #f7f7f7;display: inline-block;border:none;}
 .pagination ul.pages li a {color: #bbb;}
 .pagination ul.pages li.current {background-color: #bbb;}
-.box,.mypage-box,#projects-index ul.projects li.root {background-color: #fff; border: none; padding: 15px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.05)}
+.box,.mypage-box,#projects-index ul.projects li.root {background-color: #eaf2f7; border: none; padding: 15px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.05)}
 
 div.contextual>a.icon, input[type=submit], button {
     display: inline-block;
@@ -396,7 +396,7 @@ div.contextual>a.icon, input[type=submit], button {
     border: none;
 }
 input[type=submit], button {
-    padding: 10px;
+    padding: 0px 10px 0 10px;
     font-size: 14px;
 }
 div.contextual > a.icon {padding-left: 10px;}
@@ -435,8 +435,11 @@ a.js-contextmenu {font-size: 0;}
 .jstEditor textarea {
     padding: 15px;
 }
-jstBlock .jstTabs {
+.jstBlock .jstTabs {
     margin-bottom: -6px !important;
+}
+#content .jstTabs.tabs {
+    margin-bottom: -5px !important;
 }
 .jstTabs ul {
     margin: 0;
@@ -456,12 +459,12 @@ jstBlock .jstTabs {
 text-decoration: none;
 line-height: 1.3em;
 padding: 5px 9px 8px 9px;
-    border: 1px solid #ccc;
+    border: 1px solid #bdd1db;
     border-bottom-color: rgb(204, 204, 204);
     border-bottom-style: solid;
     border-bottom-width: 1px;
 border-bottom: 1px solid #bbbbbb;
-color: #999;
+color: #7793a2;
     font-weight: bold;
     border-radius:0;
 
@@ -472,7 +475,7 @@ height: 35px;
 }
 #content .jstTabs.tabs ul li a.selected, .jstTabs.tabs ul li a.selected {
     background-color: #fff;
-    border: 1px solid #bbbbbb;
+    border: 1px solid #bdd1db;
     border-bottom-color: rgb(187, 187, 187);
     border-bottom-style: solid;
     border-bottom-width: 1px;
@@ -730,4 +733,35 @@ fieldset#filters td.values input { height:auto;}
 
 #update .jstElements {
     padding-left: 5px !important;
+}
+#update .jstElements button {
+    border-color: #bdd1db;
+    background-color: transparent;
+}
+#update fieldset {
+    border: 1px solid #bdd1db;
+}
+#update select, #update input[type="text"], #update input[type="date"], #update textarea {
+    border: 1px solid #bdd1db;
+}
+#update .select2-container--default .select2-selection--single {
+    border: 1px solid #bdd1db !important;
+}
+
+.fancybox-inner .jstTabs ul {
+    position: relative;
+}
+.fancybox-inner .jstTabs ul li.tab-elements {
+    position: absolute;
+    top: 38px;
+    left: 0;
+}
+.fancybox-inner #issue_notes {
+    padding-top: 40px;
+}
+.fancybox-inner .jstBlock .jstTabs {
+    margin-bottom: -1px !important;
+}
+.ui-menu.ui-widget-content {
+    z-index:10000 !important;
 }
