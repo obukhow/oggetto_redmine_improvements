@@ -270,12 +270,12 @@ div.attributes {
 
 .journal {
     background: #fff;
-    border: 1px solid #e3e3e3;
+    border: 1px solid #e6f0f9;
     margin: 15px 0;
     position:relative;
 }
 .journal h4 {
-    border-bottom: 1px dotted #e3e3e3;
+    border-bottom: 1px dotted #e6f0f9;
     padding:10px;
 }
 .journal>div:before {
@@ -286,8 +286,8 @@ div.attributes {
     position: absolute;
     left: -8px;
     top: 15px;
-    border-bottom: 1px solid #e3e3e3;
-    border-left: 1px solid #e3e3e3;
+    border-bottom: 1px solid #e6f0f9;
+    border-left: 1px solid #e6f0f9;
     background-color: #fff;
     -webkit-transform:translateY(-50%) rotate(45deg);
             -ms-transform:translateY(-50%) rotate(45deg);
@@ -384,7 +384,7 @@ span.pagination {background-color: #fff; margin:0; padding: 15px; margin-top: -5
 .pagination ul.pages li {border-radius: 3px; margin-right: 5px; padding:5px; background-color: #f7f7f7;display: inline-block;border:none;}
 .pagination ul.pages li a {color: #bbb;}
 .pagination ul.pages li.current {background-color: #bbb;}
-.box,.mypage-box,#projects-index ul.projects li.root {background-color: #eaf2f7; border: none; padding: 15px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.05)}
+.box,.mypage-box,#projects-index ul.projects li.root {background-color: #fff; border: none; padding: 15px; box-shadow: 0 0 .875rem 0 rgba(53,64,82,.05)}
 
 div.contextual>a.icon, input[type=submit], button {
     display: inline-block;
@@ -730,6 +730,12 @@ fieldset#filters td.values input { height:auto;}
 #update .tabular p {
     padding-left: 120px !important;
 }
+#update #issue-form {
+    background-color: #eaf2f7;
+}
+#update #issue-form .box {
+    background-color: #eaf2f7;
+}
 
 #update .jstElements {
     padding-left: 5px !important;
@@ -738,10 +744,7 @@ fieldset#filters td.values input { height:auto;}
     border-color: #bdd1db;
     background-color: transparent;
 }
-#update fieldset {
-    border: 1px solid #bdd1db;
-}
-#update select, #update input[type="text"], #update input[type="date"], #update textarea {
+#update fieldset, #update select, #update input[type="text"], #update input[type="date"], #update textarea, #update .check_box_group {
     border: 1px solid #bdd1db;
 }
 #update .select2-container--default .select2-selection--single {
