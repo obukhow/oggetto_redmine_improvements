@@ -378,6 +378,8 @@ table.list tr.issue.priority-7 td.priority:before, .issue.priority-7 .priority .
 .autoscroll {margin-bottom: 0px;}
 table.list:not(.odd-even) tbody tr:nth-child(2n+1):hover, .odd:hover, #issue-changesets div.changeset:nth-child(2n+1):hover, table.list:not(.odd-even) tbody tr:nth-child(2n):hover, .even:hover, #issue-changesets div.changeset:nth-child(2n):hover{background-color: #cdd2db;}
 div.issue table.list tr.issue td {padding: 5px 10px 5px 0;}
+div.issue table.list tr.issue.idnt-1 td.subject {padding-left: 24px;}
+
 span.pagination {background-color: #fff; margin:0; padding: 15px; margin-top: -5px;}
 .pagination ul.pages li {border-radius: 3px; margin-right: 5px; padding:5px; background-color: #f7f7f7;display: inline-block;border:none;}
 .pagination ul.pages li a {color: #bbb;}
@@ -433,6 +435,9 @@ a.js-contextmenu {font-size: 0;}
 .jstEditor textarea {
     padding: 15px;
 }
+jstBlock .jstTabs {
+    margin-bottom: -6px !important;
+}
 .jstTabs ul {
     margin: 0;
     margin-left: 0.5em;
@@ -450,7 +455,7 @@ a.js-contextmenu {font-size: 0;}
     font-size: 1em;
 text-decoration: none;
 line-height: 1.3em;
-padding: 10px 10px 10px 10px;
+padding: 5px 9px 8px 9px;
     border: 1px solid #ccc;
     border-bottom-color: rgb(204, 204, 204);
     border-bottom-style: solid;
@@ -715,6 +720,14 @@ fieldset#filters td.values input { height:auto;}
   border-left: 4px solid transparent;
 }
 
+.tabular label {
+	font-weight: normal !important;
+    font-size: 13px;
+}
 #update .tabular p {
-    padding-left: 100px !important;
+    padding-left: 120px !important;
+}
+
+#update .jstElements {
+    padding-left: 5px !important;
 }
