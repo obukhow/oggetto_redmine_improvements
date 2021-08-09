@@ -375,6 +375,16 @@ table.list tr.issue.priority-4 td.priority:before, .issue.priority-4 .priority .
 table.list tr.issue.priority-5 td.priority:before, .issue.priority-5 .priority .value:before { content: 'High'; display:block; background-color:#fff1e2; color:#f1a454;} 
 table.list tr.issue.priority-6 td.priority:before, .issue.priority-6 .priority .value:before { content: 'Urgent'; display:block; background-color:#fee4ed; color:#f0437b;} 
 table.list tr.issue.priority-7 td.priority:before, .issue.priority-7 .priority .value:before { content: 'Immediate'; display:block; background-color:#f4ecff; color:#ba7df4;}
+table.list tr.issue.priority-6 td.priority:before, .issue.priority-21 .priority .value:before { content: 'Applied'; display:block; background-color:#fee4ed; color:#f0437b;} 
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-22 .priority .value:before { content: 'Verified (OK)'; display:block; background-color:#f4ecff; color:#ba7df4;}
+table.list tr.issue.priority-6 td.priority:before, .issue.priority-23 .priority .value:before { content: 'Verified (NOT OK)'; display:block; background-color:#fee4ed; color:#f0437b;} 
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-18 .priority .value:before { content: 'Related'; display:block; background-color:#f4ecff; color:#ba7df4;}
+table.list tr.issue.priority-6 td.priority:before, .issue.priority-19 .priority .value:before { content: 'Merged'; display:block; background-color:#fee4ed; color:#f0437b;} 
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-20 .priority .value:before { content: 'Tested'; display:block; background-color:#f4ecff; color:#ba7df4;}
+table.list tr.issue.priority-6 td.priority:before, .issue.priority-15 .priority .value:before { content: 'Ready'; display:block; background-color:#fee4ed; color:#f0437b;} 
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-16 .priority .value:before { content: 'Authorized'; display:block; background-color:#f4ecff; color:#ba7df4;}
+table.list tr.issue.priority-7 td.priority:before, .issue.priority-17 .priority .value:before { content: 'Roll-backed'; display:block; background-color:#f4ecff; color:#ba7df4;}
+
 .autoscroll {margin-bottom: 0px;}
 table.list:not(.odd-even) tbody tr:nth-child(2n+1):hover, .odd:hover, #issue-changesets div.changeset:nth-child(2n+1):hover, table.list:not(.odd-even) tbody tr:nth-child(2n):hover, .even:hover, #issue-changesets div.changeset:nth-child(2n):hover{background-color: #cdd2db;}
 div.issue table.list tr.issue td {padding: 5px 10px 5px 0;}
