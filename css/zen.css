@@ -506,6 +506,9 @@ input[type=radio],input[type=checkbox] { margin-top: 0;}
 textarea, select[multiple] {
     height: auto;
 }
+select[multiple] {
+    resize: vertical;
+}
 input.string_cf {
     width:92%;
 }
