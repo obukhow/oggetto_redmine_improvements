@@ -7,13 +7,14 @@
 // @updateURL   https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/ori.user.js
 // @include     http://redmine.oggettoweb.com/*
 // @include     https://redmine.oggettoweb.com/*
+// @include     https://redmine.oggetto.dev/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     3.0.17
+// @version     4.0.0
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    zen_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen.css?v=11
+// @resource    zen2_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen2.css?v=33
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -25,7 +26,7 @@
 // @grant       GM_listValues
 // @run-at document-start
 // ==/UserScript==
-var zen_CssSrc = GM_getResourceText("zen_CSS");
+var zen_CssSrc = GM_getResourceText("zen2_CSS");
 GM_addStyle(zen_CssSrc);
 var select4_CssSrc = GM_getResourceText("select4_CSS");
 GM_addStyle(select4_CssSrc);
@@ -46,7 +47,8 @@ var STATUS = {
     'REVIEW_FAILED': {"VALUE": 18, "TEXT": "Review failed"},
     'VERIFY_FAILED': {"VALUE": 17, "TEXT": "Verify failed"},
     'READY_FOR_STAGE': {"VALUE": 14, "TEXT": "Ready for Stage"},
-    'CLOSED': {"VALUE": 5, "TEXT": "Closed"}
+    'CLOSED': {"VALUE": 5, "TEXT": "Closed"},
+    'CODE_REVIEW': {"VALUE":25, "TEXT": "Code review"}
 };
 
 var RU_TEXT = {
@@ -67,6 +69,7 @@ var RU_TEXT = {
     MORE: 'Ещё ',
     ROLE_SETTINGS: 'Настройки роли',
     ONLY_WF_FIELDS: 'Только workflow',
+    USER_SETTINGS: 'Настройки пользователя'
 };
 
 var EN_TEXT = {
@@ -87,8 +90,8 @@ var EN_TEXT = {
     MORE: 'More ',
     ROLE_SETTINGS: 'Role Settings',
     ONLY_WF_FIELDS: 'Only workflow fields',
+    USER_SETTINGS: 'User Settings'
 };
-
 var isAssignedToMe = false;
 var myUserLink = '';
 var myID = '';
@@ -425,10 +428,11 @@ var showConfigLightBoxOnClosed = function () {
 };
 exportFunction(showConfigLightBoxOnClosed, unsafeWindow, {defineAs: "showConfigLightBoxOnClosed"});
 var showConfigLightBox = {
-    'href': '#config_form_block',
+    'src': '#config_form_block',
     'width': '600',
-    'height': '200',
-    'type': 'inline'
+    'height': '300',
+    'type': 'inline',
+    'caption': TEXT.USER_SETTINGS
 };
 unsafeWindow.showConfigLightBox = cloneInto(showConfigLightBox, unsafeWindow);
 unsafeWindow.showConfigLightBox.afterShow = unsafeWindow.showConfigLightBoxOnComplete;
@@ -438,22 +442,23 @@ function showConfig() {
     if (typeof(unsafeWindow.jQuery.fancybox) == "undefined") {
         var s = document.createElement("script");
         s.type = "text/javascript";
-        s.src = "/plugin_assets/redmine_lightbox2/javascripts/jquery.fancybox-2.1.5.pack.js?1580029733";
+        s.src = "/assets/plugin_assets/redmine_lightbox/jquery.fancybox-3.5.7.min-ef461421.js";
         $("head").append(s);
 
         var l = document.createElement('link');
         l.setAttribute('rel', 'stylesheet');
         l.setAttribute('type', 'text/css');
-        l.setAttribute('href', '/plugin_assets/redmine_lightbox2/stylesheets/jquery.fancybox-2.1.5.css?1580029733');
+        l.setAttribute('href', '/assets/plugin_assets/redmine_lightbox/jquery.fancybox-3.5.7.min-4229e66e.css');
         $("head").append(l);
     }
     setTimeout(function () { // to allow inserted content be handled by browser
+        debugger;
         if (unsafeWindow.jQuery('#configFormContainer').length < 1) {
             unsafeWindow.jQuery('body').append(GM_getResourceText("configForm_HTML"));
         } else {
             unsafeWindow.jQuery('#configFormContainer').show();
         }
-        unsafeWindow.jQuery.fancybox(unsafeWindow.showConfigLightBox);
+        unsafeWindow.jQuery.fancybox.open(unsafeWindow.showConfigLightBox);
     }, 500);
 }
 exportFunction(showConfig, unsafeWindow, {defineAs: "showConfig"});
@@ -494,10 +499,10 @@ exportFunction(showVersion, unsafeWindow, {defineAs: "showVersion"});
  */
 function canStartProgress() {
     return (currentStatus == STATUS.NEW.TEXT ||
-            currentStatus == STATUS.FEEDBACK.TEXT ||
-            currentStatus == STATUS.REVIEW_FAILED.TEXT ||
-            currentStatus == STATUS.VERIFY_FAILED.TEXT ||
-            currentStatus == STATUS.FROZEN.TEXT);
+        currentStatus == STATUS.FEEDBACK.TEXT ||
+        currentStatus == STATUS.REVIEW_FAILED.TEXT ||
+        currentStatus == STATUS.VERIFY_FAILED.TEXT ||
+        currentStatus == STATUS.FROZEN.TEXT);
 }
 
 /**
@@ -522,7 +527,7 @@ function canClose() {
  * Can do issue review
  */
 function canDoReview() {
-    return (currentStatus == STATUS.RESOLVED.TEXT && isReviewer());
+    return ((currentStatus == STATUS.RESOLVED.TEXT || currentStatus == STATUS.CODE_REVIEW.TEXT) && isReviewer());
 }
 
 /**
@@ -907,16 +912,16 @@ var _showLogTimePopupOnClosed = function () {
 };
 exportFunction(_showLogTimePopupOnClosed, unsafeWindow, {defineAs: "_showLogTimePopupOnClosed"});
 var _showLogTimePopupLightBox = {
-    'href': '#log_time_container',
+    'src': '#log_time_container',
     'width': '600',
-    'height': '250'
+    'height': '650'
 };
 unsafeWindow._showLogTimePopupLightBox = cloneInto(_showLogTimePopupLightBox, unsafeWindow);
 unsafeWindow._showLogTimePopupLightBox.afterShow = unsafeWindow._showLogTimePopupOnComplete;
 unsafeWindow._showLogTimePopupLightBox.afterClose = unsafeWindow._showLogTimePopupOnClosed;
 function _showLogTimePopup() {
     $('#log_time_container').show();
-    unsafeWindow.jQuery.fancybox(unsafeWindow._showLogTimePopupLightBox);
+    unsafeWindow.jQuery.fancybox.open(unsafeWindow._showLogTimePopupLightBox);
 }
 
 /**
@@ -942,14 +947,14 @@ function showTotalRegularTime() {
  */
 function showMyTime() {
     $('<div class="spent-by-me attribute"><div class="label">' + TEXT.SPENT_BY_ME +
-      ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
+        ':</div><div class="value value-spent-by-me">' + TEXT.LOADING + '</div>').insertAfter($('div.spent-time'));
     getTimeData().then(function(time) {
         var tUrl = getTimeTrackerUrl(false, false, true);
         var rUrl = getTimeTrackerUrl(TIME_TYPE.REGULAR, false, true);
         var fUrl = getTimeTrackerUrl(TIME_TYPE.FUCKUP, false, true);
 
         $('div.value-spent-by-me').html('<a href="' + tUrl + '">' + time.me.total.toFixed(2) + ' hours</a> (R: <a href="' + rUrl + '">'
-                                        + time.me.r.toFixed(2) + '</a>, F: <a href="' + fUrl + '">' + time.me.f.toFixed(2) + '</a>)');
+            + time.me.r.toFixed(2) + '</a>, F: <a href="' + fUrl + '">' + time.me.f.toFixed(2) + '</a>)');
     });
     addRtfBfqTime();
 }
@@ -1155,7 +1160,7 @@ function addHistoryToMenu() {
 if (isIssuePage) {
     //add buttons
     $(function() {
-        isAssignedToMe = ($('#loggedas>a').attr('href') == $('div.assigned-to>div.value>a').attr('href'));
+        isAssignedToMe = ($('#loggedas>a').attr('href').match(/\/(\d+)$/)[1] == $('div.assigned-to>div.value>a').attr('href').match(/\/(\d+)$/)[1]);
         myUserLink = $('#loggedas a').attr('href');
         myID = myUserLink.match(/(\d*)$/i)[0];
         currentStatus = $('div.status>div.value').html();
@@ -1200,7 +1205,6 @@ if (isIssuePage) {
         logIssueHistory();
         //change link styles
 
-        $('a.icon-edit').append('…');
     });
 
 }
