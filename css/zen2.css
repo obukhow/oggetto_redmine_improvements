@@ -55,8 +55,10 @@
 .icon-play:before { content: '\e803'; } /* '' */
 .icon-good:before { content: '\e810'; } /* '' */
 .icon-bad:before { content: '\e811'; } /* '' */
+.icon-froze:before { content: '\f2dc'; }
+.icon-ok:before { content: '\e80d'; }
 .icon-time-add:not(:has(svg)):before {content: '\e805';}
-.icon-user:not(:has(svg)),.icon-time-add:not(:has(svg)) {
+.icon-user:not(:has(svg)),.icon-time-add:not(:has(svg)),.icon-ok:not(:has(svg)) {
     background-image: none;
 }
 .icon-user:not(:has(svg)):before {content: '\e812';}

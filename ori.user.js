@@ -12,9 +12,9 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     4.0.0
+// @version     4.0.1
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
-// @resource    zen2_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen2.css?v=33
+// @resource    zen2_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen2.css?v=44
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
 // @resource    version_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/version3.html?v=1
 // @grant       unsafeWindow
@@ -135,7 +135,7 @@ var TIME_TYPE = {
 
 
 var defaultLightBoxOptions = {
-    'href': '#update',
+    'src': '#update',
     'width': '800',
     'height': '200',
     'type': 'inline'
@@ -464,7 +464,7 @@ function showConfig() {
 exportFunction(showConfig, unsafeWindow, {defineAs: "showConfig"});
 
 var showVersionLightBox = {
-    'href': '#versionPopup',
+    'src': '#versionPopup',
     'width': '600',
     'height': '200',
     'type': 'inline'
@@ -478,7 +478,7 @@ function showVersion() {
         } else {
             unsafeWindow.jQuery('#versionPopup').show();
         }
-        unsafeWindow.jQuery.fancybox(unsafeWindow.showVersionLightBox);
+        unsafeWindow.jQuery.fancybox.open(unsafeWindow.showVersionLightBox);
     }, 500);
 }
 
@@ -745,13 +745,14 @@ var resolveIssueOnClosed = function () {
 };
 exportFunction(resolveIssueOnClosed, unsafeWindow, {defineAs: "resolveIssueOnClosed"});
 var resolveIssueLightBox = defaultLightBoxOptions;
+resolveIssueLightBox.height = 600;
 unsafeWindow.resolveIssueLightBox = cloneInto(resolveIssueLightBox, unsafeWindow);
 unsafeWindow.resolveIssueLightBox.onComplete = unsafeWindow.resolveIssueOnComplete;
 unsafeWindow.resolveIssueLightBox.onClosed = unsafeWindow.resolveIssueOnClosed;
 function resolveIssue() {
     formPrepareToShowInPopup();
     FIELDS.SPENT_TIME.val(getTimerTime());
-    unsafeWindow.jQuery.fancybox(unsafeWindow.resolveIssueLightBox);
+    unsafeWindow.jQuery.fancybox.open(unsafeWindow.resolveIssueLightBox);
 };
 
 /**
@@ -799,7 +800,7 @@ function _showReviewResultPopup(status) {
     FIELDS.PRIVATE_NOTES.prop('checked', true);
     formPrepareToShowInPopup();
     FIELDS.STATUS.val(status);
-    unsafeWindow.jQuery.fancybox(unsafeWindow._showReviewResultPopupLightBox);
+    unsafeWindow.jQuery.fancybox.open(unsafeWindow._showReviewResultPopupLightBox);
 
 }
 /**
