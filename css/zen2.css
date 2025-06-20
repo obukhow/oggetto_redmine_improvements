@@ -53,6 +53,8 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
 .icon-play:before { content: '\e803'; } /* '' */
+.icon-good:before { content: '\e810'; } /* '' */
+.icon-bad:before { content: '\e811'; } /* '' */
 .icon-time-add:not(:has(svg)):before {content: '\e805';}
 .icon-user:not(:has(svg)),.icon-time-add:not(:has(svg)) {
     background-image: none;
