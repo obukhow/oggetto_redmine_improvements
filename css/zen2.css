@@ -380,11 +380,18 @@ div.contextual > a.icon svg {
     stroke: #fff;
 }
 
-
 .icon-only {font-family:'redmineicons'; line-height: 1.4em; font-size: 1em; width: 15px; padding-left:0px;}
 .icon-del,.icon-copy, .icon-fav-off, .icon-time-add, .icon-edit, .icon-comment, .icon-add, .icon-lock, .icon-checked,.icon-reload,.icon-save,.icon-user, .icon-fav, .icon-ok{background:none;}
 a.icon-time-add.timer {width:70px;}
 h3 .icon-only {line-height:1em; width: 1.5em;}
+
+.icon-user:not(:has(svg)) {
+    background-image: none;
+}
+.icon-user:not(:has(svg)):before {
+    content: '\e812';
+}
+
 
 .fancybox-inner .splitcontentleft,.fancybox-inner .splitcontentright {width: 100%;}
 a.js-contextmenu {font-size: 0;}
