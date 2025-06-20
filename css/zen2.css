@@ -367,6 +367,7 @@ input[type=submit], button {
     padding: 0px 10px 0 10px;
     font-size: 14px;
 }
+#content > div:nth-child(1) > span.drdn {display: none;}
 div.contextual > a.icon {padding-left: 10px;}
 div.contextual > a.icon:hover, input[type=submit]:hover, button:hover {
     opacity: .8;
@@ -375,6 +376,9 @@ div.contextual > a.icon:hover, input[type=submit]:hover, button:hover {
 div.contextual > a.icon.icon-add, div.contextual > a.icon.icon-user {background-color:#47bac1;}
 div.contextual > a.icon.icon-del,div.contextual > a.icon.icon-bad {background-color:#f44455; color:#fff;}
 div.contextual > a.icon.icon-good {background-color:#5fc27e; color:#fff;}
+div.contextual > a.icon svg {
+    stroke: #fff;
+}
 
 
 .icon-only {font-family:'redmineicons'; line-height: 1.4em; font-size: 1em; width: 15px; padding-left:0px;}
