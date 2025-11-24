@@ -12,7 +12,7 @@
 // @require     http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js
 // @require     https://raw.githubusercontent.com/robcowie/jquery-stopwatch/master/jquery.stopwatch.js
 // @require     https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js
-// @version     4.0.2
+// @version     4.0.3
 // @resource    select4_CSS  http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css
 // @resource    zen2_CSS https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/css/zen2.css?v=45
 // @resource    configForm_HTML https://raw.githubusercontent.com/obukhow/oggetto_redmine_improvements/master/html/config_2.1.html
@@ -407,7 +407,21 @@ var showConfigLightBoxOnComplete = function () {
     setTimeout(function () {
         $('#user_role').val(getMyRole());
         $('#reviewer').prop('checked', isReviewer());
-        $('#activity').val(getDefaultActivity());
+        var $activityEl = $('#activity');
+        var defaultActivity = getDefaultActivity();
+        $activityEl.val(defaultActivity)
+        apiQuery('/enumerations/time_entry_activities.json', {}, function(response) {
+            $activityEl.empty();
+            response.time_entry_activities.forEach(activity => {
+                if (activity.active) {
+                    $activityEl.append($('<option>', {
+                        value: activity.id,
+                        text: activity.name,
+                    }));
+                }
+            });
+            $activityEl.val(defaultActivity);
+        });
         getApiKey().then(function(value) {
             $('#api_key').val(value);
         });
@@ -452,7 +466,6 @@ function showConfig() {
         $("head").append(l);
     }
     setTimeout(function () { // to allow inserted content be handled by browser
-        debugger;
         if (unsafeWindow.jQuery('#configFormContainer').length < 1) {
             unsafeWindow.jQuery('body').append(GM_getResourceText("configForm_HTML"));
         } else {
@@ -1035,6 +1048,16 @@ async function getTimeData() {
     });
 
 
+}
+function apiQuery(url, data, callback) {
+    getApiKey().then(function(apiKey) {
+                $.ajax({
+                    url: url,
+                    data: data,
+                    headers: {"X-Redmine-API-Key": apiKey},
+                    complete: function (response) { callback(JSON.parse(response.responseText)); }
+                });
+            });
 }
 
 /**
