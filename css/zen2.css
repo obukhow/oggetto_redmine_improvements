@@ -377,7 +377,7 @@ input[type=submit], button {
     padding: 0px 10px 0 10px;
     font-size: 14px;
 }
-body.controller-issues #content > div:nth-child(1) > span.drdn {display: none;}
+body.controller-issues.action-show #content > div:nth-child(1) > span.drdn {display: none;}
 div.contextual > a.icon {padding-left: 10px;}
 div.contextual > a.icon:hover, input[type=submit]:hover, button:hover {
     opacity: .8;
